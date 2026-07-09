@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise Task Manager</title>
-    <!-- Import Bootstrap 5 for clean, professional styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -29,7 +28,6 @@
 
 <body>
 
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-dark bg-dark mb-4">
         <div class="container">
             <span class="navbar-brand mb-0 h1">Enterprise Task Manager</span>
@@ -39,24 +37,22 @@
 
     <div class="container">
 
-        <!-- 1. LOGIN SECTION -->
         <div id="loginSection" class="row justify-content-center">
             <div class="col-md-5">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title text-center mb-4">API Login</h5>
+                        <h5 class="card-title text-center mb-4">User Login</h5>
                         <form id="loginForm" onsubmit="handleLogin(event)">
                             <div class="mb-3">
-                                <label class="form-label">Username / Email</label>
+                                <label class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Login & Get JWT Token</button>
-                            <div id="loginError" class="text-danger mt-2 small text-center hidden">Invalid
-                                credentials.
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                            <div id="loginError" class="text-danger mt-2 small text-center hidden">Invalid credentials.
                             </div>
                         </form>
                     </div>
@@ -64,40 +60,47 @@
             </div>
         </div>
 
-        <!-- 2. DASHBOARD SECTION (Hidden until logged in) -->
         <div id="dashboardSection" class="hidden">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3>My Tasks</h3>
-                <button class="btn btn-success btn-sm">+ New Task</button>
             </div>
 
-            <!-- Task List Container -->
-            <div class="row" id="taskList">
-
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-body bg-light">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <input type="text" id="newTaskTitle" class="form-control"
+                                placeholder="Task Title (e.g. Learn Docker)">
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" id="newTaskDesc" class="form-control"
+                                placeholder="Description (Optional)">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-success w-100" onclick="createTask()">+ Add Task</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <div class="row" id="taskList"></div>
         </div>
 
     </div>
 
     <script>
-        // ==========================================
-        // BACKEND CONFIGURATION
-        // Point this to your live Render API or Localhost!
-        // ==========================================
-        const API_BASE_URL = 'https://enterprise-task-api-django-iblk.onrender.com/api';
-
+        const API_BASE_URL = 'http://localhost:8000/api';
         let jwtAccessToken = null;
 
-        // --- 1. Authentication Logic ---
+
         async function handleLogin(event) {
             event.preventDefault();
-
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('loginError');
 
             try {
-                // POST request to your Django Auth Endpoint
+
                 const response = await fetch(`${API_BASE_URL}/auth/login/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -106,14 +109,13 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    jwtAccessToken = data.access; // JWT token
+                    jwtAccessToken = data.access;
 
-                    // Hide Login, Show Dashboard
+
                     document.getElementById('loginSection').classList.add('hidden');
                     document.getElementById('dashboardSection').classList.remove('hidden');
                     document.getElementById('logoutBtn').classList.remove('hidden');
 
-                    // Fetch the user's tasks using the new token
                     fetchTasks();
                 } else {
                     errorDiv.classList.remove('hidden');
@@ -124,27 +126,63 @@
             }
         }
 
-        //  2. Fetch Tasks Logic 
+
+        async function createTask() {
+            const titleInput = document.getElementById('newTaskTitle');
+            const descInput = document.getElementById('newTaskDesc');
+
+            if (!titleInput.value) {
+                alert("Please enter a task title!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/tasks/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${jwtAccessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        title: titleInput.value,
+                        description: descInput.value,
+                        status: 'TODO'
+                    })
+                });
+
+                if (response.ok) {
+
+                    titleInput.value = '';
+                    descInput.value = '';
+
+
+                    fetchTasks();
+                } else {
+                    alert("Error creating task. Check terminal logs.");
+                }
+            } catch (error) {
+                console.error("Failed to create task:", error);
+            }
+        }
+
+
         async function fetchTasks() {
             const taskListDiv = document.getElementById('taskList');
             taskListDiv.innerHTML = '<div class="text-center w-100">Loading tasks...</div>';
 
             try {
-                // GET request to your Django Tasks Endpoint
                 const response = await fetch(`${API_BASE_URL}/tasks/`, {
                     method: 'GET',
                     headers: {
-                        // This is how we prove to Django who we are!
                         'Authorization': `Bearer ${jwtAccessToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
 
                 if (response.ok) {
-                    // If you are using Pagination, data might be inside data.results
                     const data = await response.json();
                     const tasks = data.results ? data.results : data;
-
                     renderTasks(tasks);
                 } else {
                     alert("Session expired or unauthorized. Please login again.");
@@ -155,22 +193,19 @@
             }
         }
 
-        // 3. UI Rendering Logic 
+
         function renderTasks(tasks) {
             const taskListDiv = document.getElementById('taskList');
-            taskListDiv.innerHTML = ''; // Clear loading text
+            taskListDiv.innerHTML = '';
 
             if (tasks.length === 0) {
-                taskListDiv.innerHTML = '<div class="alert alert-info">No tasks found. Create one!</div>';
+                taskListDiv.innerHTML = '<div class="alert alert-info w-100 text-center">No tasks found. Create one above!</div>';
                 return;
             }
 
             tasks.forEach(task => {
-                // Check status for color coding
-                const badgeColor = task.status === 'DONE' ? 'bg-success' :
-                    (task.status === 'IN_PROGRESS' ? 'bg-warning' : 'bg-secondary');
+                const badgeColor = task.status === 'DONE' ? 'bg-success' : (task.status === 'IN_PROGRESS' ? 'bg-warning' : 'bg-secondary');
 
-                // Build the Bootstrap Card HTML
                 const cardHtml = `
                 <div class="col-md-6 mb-3">
                     <div class="card task-card h-100 border-0 shadow-sm">
@@ -179,18 +214,15 @@
                                 <h5 class="card-title text-primary mb-0">${task.title}</h5>
                                 <span class="badge ${badgeColor}">${task.status}</span>
                             </div>
-                            <p class="card-text text-muted small">${task.description || 'No description provided.'}</p>
-                            <hr>
-                            <p class="mb-0 small text-secondary">
-                                <strong>Notes:</strong> ${task.notes ? task.notes.length : 0} attached
-                            </p>
+                            <p class="card-text text-muted small">${task.description || 'No description'}</p>
                         </div>
                     </div>
                 </div>
-            `;
+                `;
                 taskListDiv.innerHTML += cardHtml;
             });
         }
+
 
         function logout() {
             jwtAccessToken = null;
@@ -200,7 +232,6 @@
             document.getElementById('loginForm').reset();
         }
     </script>
-
 </body>
 
 </html>

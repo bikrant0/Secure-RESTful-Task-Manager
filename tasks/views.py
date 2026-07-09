@@ -2,8 +2,9 @@ from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwner
 from .models import Task
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, NoteSerializer
 from .pagination import TaskPagination
+from django.shortcuts import render
 
 
 
@@ -31,10 +32,13 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 
 class NoteCreateView(generics.CreateAPIView):
-    serializer_class = TaskSerializer
+    serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
         task_id = self.kwargs.get('task_id')
-        task = Task.objects.get(id=task_id, user=self.request.user)
+        task = Task.objects.get(Task, id=task_id,user=self.request.user)
         serializer.save(task=task)
+        
+def serve_frontend(request):
+    return render(request, "index.html")
