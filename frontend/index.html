@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,233 +6,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise Task Manager</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .task-card {
-            transition: transform 0.2s;
-        }
-
-        .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 
 <body>
-
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container">
-            <span class="navbar-brand mb-0 h1">Enterprise Task Manager</span>
-            <button id="logoutBtn" class="btn btn-outline-light btn-sm hidden" onclick="logout()">Logout</button>
+    <div class="left-panel">
+        <div class="brand">
+            <div class="brand-label" class="brand-label"></div>
+            <h1>Enterprise Task Manager</h1>
+            <p>Streamline your workflow, boost productivity, and collaborate seamlessly with your team.</p>
         </div>
-    </nav>
-
-    <div class="container">
-
-        <div id="loginSection" class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-4">User Login</h5>
-                        <form id="loginForm" onsubmit="handleLogin(event)">
-                            <div class="mb-3">
-                                <label class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Login</button>
-                            <div id="loginError" class="text-danger mt-2 small text-center hidden">Invalid credentials.
-                            </div>
-                        </form>
-                    </div>
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-number">01</div>
+                <div class="feature-text">
+                    <h3>Task Management</h3>
+                    <p>Organize and prioritize your tasks efficiently</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-number">02</div>
+                <div class="feature-text">
+                    <h3>Analytics Dashboard</h3>
+                    <p>Track progress and gain insights</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-number">03</div>
+                <div class="feature-text">
+                    <h3>Team Collaboration</h3>
+                    <p>Work together in real-time</p>
                 </div>
             </div>
         </div>
-
-        <div id="dashboardSection" class="hidden">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3>My Tasks</h3>
-            </div>
-
-            <div class="card mb-4 shadow-sm border-0">
-                <div class="card-body bg-light">
-                    <div class="row g-2">
-                        <div class="col-md-5">
-                            <input type="text" id="newTaskTitle" class="form-control"
-                                placeholder="Task Title (e.g. Learn Docker)">
-                        </div>
-                        <div class="col-md-5">
-                            <input type="text" id="newTaskDesc" class="form-control"
-                                placeholder="Description (Optional)">
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-success w-100" onclick="createTask()">+ Add Task</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row" id="taskList"></div>
-        </div>
-
     </div>
 
-    <script>
-        const API_BASE_URL = 'http://localhost:8000/api';
-        let jwtAccessToken = null;
+    <div class="right-panel">
+        <div class="decorative-shape shape-1"></div>
+        <div class="decorative-shape shape-2"></div>
 
+        <div class="login-container">
+            <div id="loginView">
+                <div class="login-header">
+                    <h2>Login your account!</h2>
+                    <p>Welcome back! Please enter your details</p>
+                </div>
 
-        async function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('loginError');
+                <div class="error-message" id="loginError">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="loginErrorText">Error</span>
+                </div>
 
-            try {
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="email">E-mail</div>
+                    <div class="tab" data-tab="mobile">Mobile Number</div>
+                </div>
 
-                const response = await fetch(`${API_BASE_URL}/auth/login/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    jwtAccessToken = data.access;
-
-
-                    document.getElementById('loginSection').classList.add('hidden');
-                    document.getElementById('dashboardSection').classList.remove('hidden');
-                    document.getElementById('logoutBtn').classList.remove('hidden');
-
-                    fetchTasks();
-                } else {
-                    errorDiv.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Login failed:", error);
-                alert("Could not connect to the API. Is your Django server running?");
-            }
-        }
-
-
-        async function createTask() {
-            const titleInput = document.getElementById('newTaskTitle');
-            const descInput = document.getElementById('newTaskDesc');
-
-            if (!titleInput.value) {
-                alert("Please enter a task title!");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/tasks/`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${jwtAccessToken}`,
-                        'Content-Type': 'application/json'
-                    },
-
-                    body: JSON.stringify({
-                        title: titleInput.value,
-                        description: descInput.value,
-                        status: 'TODO'
-                    })
-                });
-
-                if (response.ok) {
-
-                    titleInput.value = '';
-                    descInput.value = '';
-
-
-                    fetchTasks();
-                } else {
-                    alert("Error creating task. Check terminal logs.");
-                }
-            } catch (error) {
-                console.error("Failed to create task:", error);
-            }
-        }
-
-
-        async function fetchTasks() {
-            const taskListDiv = document.getElementById('taskList');
-            taskListDiv.innerHTML = '<div class="text-center w-100">Loading tasks...</div>';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/tasks/`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${jwtAccessToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const tasks = data.results ? data.results : data;
-                    renderTasks(tasks);
-                } else {
-                    alert("Session expired or unauthorized. Please login again.");
-                    logout();
-                }
-            } catch (error) {
-                console.error("Failed to fetch tasks:", error);
-            }
-        }
-
-
-        function renderTasks(tasks) {
-            const taskListDiv = document.getElementById('taskList');
-            taskListDiv.innerHTML = '';
-
-            if (tasks.length === 0) {
-                taskListDiv.innerHTML = '<div class="alert alert-info w-100 text-center">No tasks found. Create one above!</div>';
-                return;
-            }
-
-            tasks.forEach(task => {
-                const badgeColor = task.status === 'DONE' ? 'bg-success' : (task.status === 'IN_PROGRESS' ? 'bg-warning' : 'bg-secondary');
-
-                const cardHtml = `
-                <div class="col-md-6 mb-3">
-                    <div class="card task-card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title text-primary mb-0">${task.title}</h5>
-                                <span class="badge ${badgeColor}">${task.status}</span>
-                            </div>
-                            <p class="card-text text-muted small">${task.description || 'No description'}</p>
+                <form id="loginForm">
+                    <div class="form-group" id="emailGroup">
+                        <label>Email Address</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                            <i class="fas fa-envelope"></i>
                         </div>
                     </div>
+
+                    <div class="form-group" id="mobileGroup" style="display: none;">
+                        <label>Mobile Number</label>
+                        <div class="input-wrapper">
+                            <input type="tel" id="loginMobile" placeholder="Enter your mobile number">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                            <i class="fas fa-lock"></i>
+                            <span class="password-toggle" onclick="togglePassword('loginPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#" id="openForgotModal">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="loginBtn">
+                        Continue
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+
+                <div class="divider"><span>Sign in With</span></div>
+
+                <div class="social-login">
+                    <div class="social-btn facebook"><i class="fab fa-facebook-f"></i></div>
+                    <div class="social-btn google"><i class="fab fa-google"></i></div>
+                    <div class="social-btn apple"><i class="fab fa-apple"></i></div>
                 </div>
-                `;
-                taskListDiv.innerHTML += cardHtml;
-            });
-        }
+
+                <div class="signup-link">
+                    Don't have an account? <a href="#" id="showSignupBtn">Sign up</a>
+                </div>
+            </div>
+
+            <div id="signupView" class="hidden">
+                <div class="login-header">
+                    <h2>Create your account!</h2>
+                    <p>Join us today and get started</p>
+                </div>
+
+                <div class="error-message" id="signupError">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="signupErrorText">Error</span>
+                </div>
+
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="signupName" placeholder="Enter your full name" required>
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="signupPassword" placeholder="Create a password" required>
+                            <i class="fas fa-lock"></i>
+                            <span class="password-toggle" onclick="togglePassword('signupPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <small class="password-hint">Must be at least 8 characters</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="signupConfirmPassword" placeholder="Confirm your password"
+                                required>
+                            <i class="fas fa-lock"></i>
+                            <span class="password-toggle" onclick="togglePassword('signupConfirmPassword', this)">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
 
 
-        function logout() {
-            jwtAccessToken = null;
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('dashboardSection').classList.add('hidden');
-            document.getElementById('logoutBtn').classList.add('hidden');
-            document.getElementById('loginForm').reset();
-        }
-    </script>
+
+                    <button type="submit" class="btn-submit" id="signupBtn">
+                        Create Account
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+
+                <div class="divider"><span>Or sign up with</span></div>
+
+                <div class="social-login">
+                    <div class="social-btn facebook"><i class="fab fa-facebook-f"></i></div>
+                    <div class="social-btn google"><i class="fab fa-google"></i></div>
+                    <div class="social-btn apple"><i class="fab fa-apple"></i></div>
+                </div>
+
+                <div class="signup-link">
+                    Already have an account? <a href="#" id="showLoginBtn">Sign in</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="forgotPasswordModal" style="display: none;">
+        <div class="modal-container">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3>Forgot Password?</h3>
+                <p>Enter your email address and we'll send you a link to reset your password.</p>
+            </div>
+
+            <div class="error-message" id="modalError">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="modalErrorText">Error</span>
+            </div>
+
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="resetEmail" placeholder="Enter your email" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="modalSubmitBtn">
+                    Send Reset Link
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="#" id="backToLoginFromModal" style="color: #667eea; text-decoration: none; font-size: 14px;">
+                    Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'script.js' %}"></script>
 </body>
 
 </html>
