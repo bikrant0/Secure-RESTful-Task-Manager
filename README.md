@@ -1,107 +1,71 @@
-### Enterprise Task & Note Manager API
+# Enterprise Task Manager (Full-Stack SPA)
 
-A production-ready, multi-tenant RESTful API built with Django REST Framework. This project demonstrates enterprise-level backend architecture, focusing on relational data integrity, secure stateless authentication, strict object-level permissions, and a decoupled Client-Server architecture.
+A modern, fully decoupled Full-Stack web application built to manage tasks efficiently. This project demonstrates enterprise-level backend architecture using **Django REST Framework (DRF)** and a responsive, vanilla JavaScript **Single Page Application (SPA)** on the frontend.
 
-## Enterprise Features Implemented
+## Architecture Overview
 
-Custom User Model: Replaced Django's default user model with a custom, email-based authentication system before initial migrations to ensure future scalability.
+This project is built with a strict separation of concerns. The backend acts strictly as an API, serving JSON data and managing secure authentication, while the frontend is a standalone SPA that communicates with the backend via the `fetch` API.
 
-Relational Database Integrity: Implemented 1-to-Many relationships (User -> Tasks -> Notes) utilizing Foreign Keys with CASCADE delete rules to prevent orphan records.
+### Tech Stack
+* **Backend:** Python, Django, Django REST Framework (DRF)
+* **Authentication:** JSON Web Tokens (JWT) via `djangorestframework-simplejwt`
+* **Database:** SQLite / PostgreSQL 
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript, Bootstrap 5
+* **Security:** Cryptographic Password Hashing, CORS Management
 
-Nested Serializers: Engineered complex JSON payloads where a single Task request dynamically fetches and nests all associated Notes using reverse relationships (related_name).
+---
 
-Data Isolation & Object-Level Permissions: * Overrode QuerySets to ensure users can only ever retrieve their own data.
+## Core Features
 
-Built custom permission classes (IsOwner) to verify database row ownership before allowing UPDATE or DELETE operations.
+### Security & Authentication
+* **Custom User Model:** Implemented a scalable `CustomUser` model overriding Django's default.
+* **JWT Authentication:** Stateless, secure API authentication using Access and Refresh tokens.
+* **Secure Registration:** API endpoint for new user registration utilizing built-in cryptographic password hashing (`set_password`).
+* **CORS Policy:** Configured Cross-Origin Resource Sharing to allow seamless communication between the frontend client and backend API.
 
-Decoupled Frontend Architecture: Built a standalone Vanilla JS and Bootstrap 5 frontend dashboard to consume the API, proving cross-origin resource sharing (CORS) and token injection capabilities.
+### Task Management API
+* **Full CRUD Operations:** Create, Read, Update, and Delete tasks.
+* **User Isolation:** API strictly returns and manipulates tasks belonging *only* to the currently authenticated user.
+* **Status Tracking:** Tasks are tracked via states (TODO, IN_PROGRESS, DONE).
 
-Automated CI/CD & Cloud Hosting: Abstracted deployment using GitHub Actions for automated testing and continuous delivery to Render, backed by a live serverless PostgreSQL database (Neon).
+### Frontend SPA (Single Page Application)
+* **Modern UI/UX:** Responsive, split-screen SaaS-style authentication page.
+* **Dynamic DOM Manipulation:** Seamlessly transitions between Authentication and Dashboard views without page reloads.
+* **API Integration:** Asynchronous JavaScript handling HTTP GET/POST requests and JWT token attachment in authorization headers.
 
-## Tech Stack
-
-Backend: Python 3, Django, Django REST Framework (DRF)
-
-Database: PostgreSQL (Cloud-hosted via Neon, psycopg2-binary)
-
-Frontend (Client): HTML5, Bootstrap 5, Vanilla JavaScript (Fetch API)
-
-Deployment & CI/CD: Render, GitHub Actions
-
-Security: JSON Web Tokens (JWT) via djangorestframework-simplejwt
+---
 
 ## Project Structure
 
+```text
 enterprise_task_manager/
 │
-├── core/                 # Main configuration, settings, and global URLs
-├── accounts/             # App: Handles Custom User Model & Auth Logic
-├── tasks/                # App: Handles Task & Note models, views, and permissions
-├── frontend/             # Client: Standalone HTML/JS Dashboard
-├── requirements.txt      # Python dependencies
-└── manage.py             # Django entry point
+├── core/                   # Main Django configuration & global URL routing
+├── accounts/               # Authentication app (CustomUser, Auth APIs, Serializers)
+├── tasks/                  # Core business logic (Task APIs, Models, Views)
+├── templates/              # Frontend UI assets (index.html SPA)
+├── manage.py               # Django execution script
+└── README.md               # Project documentation
+---
 
+## How to Run Locally
+1. Backend Setup
+Clone the repository and set up your virtual environment:
 
-## API Endpoints
-
-Authentication (accounts & core)
-
-POST /api/auth/login/ - Accepts username/password, returns JWT Access and Refresh tokens.
-
-POST /api/auth/refresh/ - Accepts a refresh token to generate a new access token.
-
-Tasks (tasks) - Requires JWT Access Token
-
-GET /api/tasks/ - Lists all tasks for the logged-in user (supports ?search= and ?page=).
-
-POST /api/tasks/ - Creates a new task and assigns it to the authenticated user.
-
-GET /api/tasks/<id>/ - Retrieves details of a specific task (must be the owner).
-
-PUT /api/tasks/<id>/ - Updates a specific task (must be the owner).
-
-DELETE /api/tasks/<id>/- Deletes a specific task and cascades deletion to all attached notes.
-
-Notes (tasks) - Requires JWT Access Token
-
-POST /api/tasks/<id>/notes/ - Creates a new note attached to a specific task.
-
-## Local Setup Instructions
-
-# Clone the repository
-
-git clone [https://github.com/bikrant0/enterprise-task-api-django.git](https://github.com/bikrant0/enterprise-task-api-django.git)
-cd enterprise-task-api-django
-
-
-Set up the Python Virtual Environment
-
-# Windows
+git clone [https://github.com/yourusername/enterprise-task-manager.git](https://github.com/yourusername/enterprise-task-manager.git)
+cd enterprise-task-manager
 python -m venv venv
-venv\Scripts\activate 
+source venv/bin/activate  
 
-# Mac/Linux
-python3 -m venv venv
-source venv/bin/activate
-
-
-Install Dependencies
-
+# On Windows use: venv\Scripts\activate
+1. Install the dependencies:
 pip install -r requirements.txt
 
-
-Apply Database Migrations
-
-python manage.py makemigrations accounts
-python manage.py makemigrations tasks
+2. Database Migrations
+Apply the initial migrations for the CustomUser and Tasks tables:
+python manage.py makemigrations
 python manage.py migrate
 
-
-Create a Superuser & Run the Server
-
-python manage.py createsuperuser
+3. Start the Server
+Run the local development server:
 python manage.py runserver
-
-
-Run the Frontend Dashboard
-Open frontend/index.html directly in your web browser (Chrome/Edge/Firefox) to interact with the API visually.
