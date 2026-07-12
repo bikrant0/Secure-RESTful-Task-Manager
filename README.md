@@ -34,7 +34,42 @@ This project is built with a strict separation of concerns. The backend acts str
 * **API Integration:** Asynchronous JavaScript handling HTTP GET/POST requests and JWT token attachment in authorization headers.
 
 ---
+## Local Setup & Installation
 
+1. **Clone the repository and set up your virtual environment:**
+
+   ```bash
+          git clone [https://github.com/yourusername/enterprise-task-manager.git](https://github.com/yourusername/enterprise-task-manager.git) 
+          cd django-url-shortener
+
+2. **Create and activate a virtual environment**
+
+        python -m venv venv
+
+        # On Windows:
+        venv\Scripts\activate
+        
+        # On Mac/Linux:
+        source venv/bin/activate
+        
+
+3. **Install dependencies**
+
+       pip install -r requirements.txt
+
+4. **Database Migrations**
+
+   Apply the initial migrations for the CustomUser and Tasks tables:
+
+        python manage.py makemigrations
+        python manage.py migrate
+
+5. **Start the Server**
+
+    Run the local development server:
+
+        python manage.py runserver
+---
 ## Project Structure
 
 ```text
@@ -43,29 +78,12 @@ enterprise_task_manager/
 ├── core/                   # Main Django configuration & global URL routing
 ├── accounts/               # Authentication app (CustomUser, Auth APIs, Serializers)
 ├── tasks/                  # Core business logic (Task APIs, Models, Views)
-├── templates/              # Frontend UI assets (index.html SPA)
+├── frontend/              # Frontend UI assets (index.html SPA)
 ├── manage.py               # Django execution script
 └── README.md               # Project documentation
----
 
-## How to Run Locally
-1. Backend Setup
-Clone the repository and set up your virtual environment:
 
-git clone [https://github.com/yourusername/enterprise-task-manager.git](https://github.com/yourusername/enterprise-task-manager.git)
-cd enterprise-task-manager
-python -m venv venv
-source venv/bin/activate  
 
-# On Windows use: venv\Scripts\activate
-1. Install the dependencies:
-pip install -r requirements.txt
 
-2. Database Migrations
-Apply the initial migrations for the CustomUser and Tasks tables:
-python manage.py makemigrations
-python manage.py migrate
-
-3. Start the Server
 Run the local development server:
 python manage.py runserver
