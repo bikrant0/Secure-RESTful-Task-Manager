@@ -81,9 +81,3 @@ enterprise_task_manager/
 ├── frontend/              # Frontend UI assets (index.html SPA)
 ├── manage.py               # Django execution script
 └── README.md               # Project documentation
-
-
-
-
-Run the local development server:
-python manage.py runserver
