@@ -4,7 +4,8 @@ from .permissions import IsOwner
 from .models import Task
 from .serializers import TaskSerializer, NoteSerializer
 from .pagination import TaskPagination
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+
 
 
 
@@ -37,7 +38,7 @@ class NoteCreateView(generics.CreateAPIView):
     
     def perform_create(self, serializer):
         task_id = self.kwargs.get('task_id')
-        task = Task.objects.get(Task, id=task_id,user=self.request.user)
+        task = get_object_or_404(Task, id=task_id, user=self.request.user)
         serializer.save(task=task)
         
 def serve_frontend(request):

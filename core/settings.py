@@ -72,14 +72,16 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'enterprise_db',
-        'USER': 'admin',
-        'PASSWORD': 'adminpassword',
-        'HOST' : '127.0.0.1',
-        'PORT': '5466',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+#CLOUD DATABASE CONFIGURATION
+database_url = os.environ.get("DATABASE_URL")
+
+if database_url:
+    DATABASES['default'] = dj_database_url.parse(database_url)
 
 
 # Password validation
@@ -100,6 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -122,7 +125,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend'),
 ]
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -130,11 +133,3 @@ REST_FRAMEWORK = {
     )
 }
 
-
-#CLOUD DATABASE CONFIGURATION
-database_url = os.environ.get("DATABASE_URL")
-
-database_url = "postgresql://neondb_owner:npg_tYRJIc8gvp3A@ep-mute-leaf-atphruxh.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"
-
-if database_url:
-    DATABASES['default'] = dj_database_url.parse(database_url)

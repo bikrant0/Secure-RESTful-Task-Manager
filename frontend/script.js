@@ -80,14 +80,12 @@ if (openModalBtn) openModalBtn.addEventListener('click', (e) => { e.preventDefau
 if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
 if (backToLoginBtn) backToLoginBtn.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
 
-// Close modal if clicking outside the white box
 window.addEventListener('click', (e) => {
     if (e.target === modal) {
         closeModal();
     }
 });
 
-// Handle Forgot Password Form Submit
 const forgotForm = document.getElementById('forgotPasswordForm');
 if (forgotForm) {
     forgotForm.addEventListener('submit', (e) => {
@@ -122,7 +120,7 @@ if (forgotForm) {
     });
 }
 
-// --- 5. LOGIN FORM SUBMISSION ---
+// --- 5. LOGIN FORM SUBMISSION (still fake — this is our NEXT task, not touched yet) ---
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
@@ -131,7 +129,6 @@ if (loginForm) {
         const errorText = document.getElementById('loginErrorText');
         const btn = document.getElementById('loginBtn');
 
-        // Basic Validation
         const activeTab = document.querySelector('.tab.active').dataset.tab;
         let isValid = true;
 
@@ -167,7 +164,6 @@ if (loginForm) {
         btn.classList.add('loading');
         btn.disabled = true;
 
-        // Simulate API call
         setTimeout(() => {
             btn.classList.remove('loading');
             btn.disabled = false;
@@ -176,10 +172,10 @@ if (loginForm) {
     });
 }
 
-// --- 6. SIGNUP FORM SUBMISSION ---
+// --- 6. SIGNUP FORM SUBMISSION (real API call) ---
 const signupForm = document.getElementById('signupForm');
 if (signupForm) {
-    signupForm.addEventListener('submit', (e) => {
+    signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const name = document.getElementById('signupName').value.trim();
@@ -190,7 +186,6 @@ if (signupForm) {
         const errorDiv = document.getElementById('signupError');
         const errorText = document.getElementById('signupErrorText');
 
-        // Validation
         if (!name) {
             errorText.textContent = 'Please enter your full name.';
             errorDiv.classList.add('show');
@@ -217,29 +212,40 @@ if (signupForm) {
         btn.classList.add('loading');
         btn.disabled = true;
 
-        // Simulate API call
-        setTimeout(() => {
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            alert('Account created successfully!');
+        const response = await fetch('/api/auth/register/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                first_name: name,
+                email: email,
+                password: pass
+            })
+        });
 
-            // Switch back to login view
+        const data = await response.json();
+
+        btn.classList.remove('loading');
+        btn.disabled = false;
+
+        if (!response.ok) {
+            errorText.textContent = data.email ? data.email[0] : 'Something went wrong. Please try again.';
+            errorDiv.classList.add('show');
+        } else {
+            alert('Account created successfully!');
             signupView.classList.add('hidden');
             loginView.classList.remove('hidden');
             signupForm.reset();
-        }, 1500);
+        }
     });
 }
 
 // --- 7. REAL-TIME ERROR CLEARING ---
-// Clear login errors when user starts typing
 document.querySelectorAll('#loginForm input').forEach(input => {
     input.addEventListener('input', () => {
         document.getElementById('loginError').classList.remove('show');
     });
 });
 
-// Clear signup errors when user starts typing
 document.querySelectorAll('#signupForm input').forEach(input => {
     input.addEventListener('input', () => {
         document.getElementById('signupError').classList.remove('show');
@@ -252,7 +258,6 @@ document.querySelectorAll('.social-btn').forEach(btn => {
         const provider = this.classList.contains('facebook') ? 'Facebook' :
             this.classList.contains('google') ? 'Google' : 'Apple';
 
-        // Add loading state
         this.style.opacity = '0.7';
         this.style.pointerEvents = 'none';
 

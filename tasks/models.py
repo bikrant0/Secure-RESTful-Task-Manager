@@ -9,12 +9,16 @@ class Task(models.Model):
     ]
     
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='TODO')
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tasks')
     
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta: 
+        ordering = ['created_at'] 
     
     def __str__(self):
         return self.title
@@ -23,7 +27,8 @@ class Note(models.Model):
     content = models.TextField()
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='notes')
     
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"Note on: {self.task.title}"
