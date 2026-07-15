@@ -26,25 +26,6 @@ if (showLoginBtn) {
     });
 }
 
-// --- 2. TAB SWITCHING (EMAIL <-> MOBILE) ---
-const tabs = document.querySelectorAll('.tab');
-const emailGroup = document.getElementById('emailGroup');
-const mobileGroup = document.getElementById('mobileGroup');
-
-tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        if (tab.dataset.tab === 'email') {
-            emailGroup.style.display = 'block';
-            mobileGroup.style.display = 'none';
-        } else {
-            emailGroup.style.display = 'none';
-            mobileGroup.style.display = 'block';
-        }
-    });
-});
 
 // --- 3. PASSWORD TOGGLE (EYE ICON) ---
 function togglePassword(inputId, toggleBtn) {
@@ -123,33 +104,25 @@ if (forgotForm) {
 // --- 5. LOGIN FORM SUBMISSION (still fake — this is our NEXT task, not touched yet) ---
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const errorDiv = document.getElementById('loginError');
         const errorText = document.getElementById('loginErrorText');
         const btn = document.getElementById('loginBtn');
 
-        const activeTab = document.querySelector('.tab.active').dataset.tab;
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
         let isValid = true;
 
-        if (activeTab === 'email') {
-            const email = document.getElementById('loginEmail').value.trim();
-            if (!email) {
-                errorText.textContent = 'Please enter your email address.';
-                isValid = false;
-            } else if (!validateEmail(email)) {
-                errorText.textContent = 'Please enter a valid email address.';
-                isValid = false;
-            }
-        } else {
-            const mobile = document.getElementById('loginMobile').value.trim();
-            if (!mobile) {
-                errorText.textContent = 'Please enter your mobile number.';
-                isValid = false;
-            }
+        if (!email) {
+            errorText.textContent = 'Please enter your email address.';
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            errorText.textContent = 'Please enter a valid email address.';
+            isValid = false;
         }
 
-        const password = document.getElementById('loginPassword').value;
         if (!password) {
             errorText.textContent = 'Please enter your password.';
             isValid = false;
@@ -164,11 +137,26 @@ if (loginForm) {
         btn.classList.add('loading');
         btn.disabled = true;
 
-        setTimeout(() => {
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            alert('Login successful!');
-        }, 1500);
+        const response = await fetch('/api/auth/login/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+        });
+
+        const data = await response.json();
+
+        btn.classList.remove('loading');
+        btn.disabled = false;
+
+        if (!response.ok) {
+            errorText.textContent = data.detail || 'Invalid email or password.';
+            errorDiv.classList.add('show');
+        } else {
+            localStorage.setItem('access', data.access);
+            localStorage.setItem('refresh', data.refresh);
+            alert('Login successful! Tokens saved.');
+            loginForm.reset();
+        }
     });
 }
 
