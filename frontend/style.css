@@ -267,8 +267,9 @@ body {
     cursor: pointer;
     color: #999;
     transition: color 0.3s ease;
-    z-index: 2;
+    z-index: 10;
     pointer-events: auto;
+    padding: 5px;
 }
 
 .password-toggle:hover {
@@ -590,6 +591,17 @@ body {
 }
 
 /* Input validation styles */
+.form-group input {
+    width: 100%;
+    padding: 14px 45px 14px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    outline: none;
+    position: relative;
+}
+
 .form-group input.valid {
     border-color: #3c3;
 }

@@ -6,11 +6,19 @@ class Task(models.Model):
         ('TODO', 'To Do'),
         ('IN_PROGRESS', 'In Progress'),
         ('DONE', 'Done'),
+        ]
+
+    PRIORITY_CHOICES = [
+    ('HIGH', 'Very Important'),
+    ('MEDIUM', 'Important'),
+    ('LOW', 'Less Important'),
     ]
     
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='TODO')
+    priority = models.CharField(choices=STATUS_CHOICES, max_length=20, default='MEDIUM')
+    due_date = models.DateField(null=True, blank=True)
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tasks')
     

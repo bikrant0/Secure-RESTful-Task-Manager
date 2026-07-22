@@ -41,5 +41,8 @@ class NoteCreateView(generics.CreateAPIView):
         task = get_object_or_404(Task, id=task_id, user=self.request.user)
         serializer.save(task=task)
         
-def serve_frontend(request):
+def frontend_page(request):
     return render(request, "index.html")
+
+def dashboard_page(request):
+    return render(request, "dashboard.html")

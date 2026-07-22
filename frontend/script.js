@@ -4,6 +4,21 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+function togglePassword(inputId, toggleBtn) {
+    const input = document.getElementById(inputId);
+    const icon = toggleBtn.querySelector('i');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
 // --- 1. VIEW SWITCHING (LOGIN <-> SIGNUP) ---
 const loginView = document.getElementById('loginView');
 const signupView = document.getElementById('signupView');
@@ -26,24 +41,7 @@ if (showLoginBtn) {
     });
 }
 
-
-// --- 3. PASSWORD TOGGLE (EYE ICON) ---
-function togglePassword(inputId, toggleBtn) {
-    const input = document.getElementById(inputId);
-    const icon = toggleBtn.querySelector('i');
-
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-}
-
-// --- 4. FORGOT PASSWORD MODAL ---
+// --- 2. FORGOT PASSWORD MODAL ---
 const modal = document.getElementById('forgotPasswordModal');
 const openModalBtn = document.getElementById('openForgotModal');
 const closeModalBtn = document.getElementById('modalClose');
@@ -62,26 +60,19 @@ if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
 if (backToLoginBtn) backToLoginBtn.addEventListener('click', (e) => { e.preventDefault(); closeModal(); });
 
 window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        closeModal();
-    }
+    if (e.target === modal) closeModal();
 });
 
 const forgotForm = document.getElementById('forgotPasswordForm');
 if (forgotForm) {
-    forgotForm.addEventListener('submit', (e) => {
+    forgotForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('resetEmail').value.trim();
         const modalErrorDiv = document.getElementById('modalError');
         const modalErrorText = document.getElementById('modalErrorText');
         const btn = document.getElementById('modalSubmitBtn');
 
-        if (!email) {
-            modalErrorText.textContent = 'Please enter your email address.';
-            modalErrorDiv.classList.add('show');
-            return;
-        }
-        if (!validateEmail(email)) {
+        if (!email || !validateEmail(email)) {
             modalErrorText.textContent = 'Please enter a valid email address.';
             modalErrorDiv.classList.add('show');
             return;
@@ -101,7 +92,7 @@ if (forgotForm) {
     });
 }
 
-// --- 5. LOGIN FORM SUBMISSION (still fake — this is our NEXT task, not touched yet) ---
+// --- 3. LOGIN FORM SUBMISSION (Simplified for Email Only) ---
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -109,6 +100,7 @@ if (loginForm) {
         const errorDiv = document.getElementById('loginError');
         const errorText = document.getElementById('loginErrorText');
         const btn = document.getElementById('loginBtn');
+        const successMsg = document.getElementById('successMessage');
 
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
@@ -130,6 +122,7 @@ if (loginForm) {
 
         if (!isValid) {
             errorDiv.classList.add('show');
+            if (successMsg) successMsg.classList.remove('show');
             return;
         }
 
@@ -137,30 +130,49 @@ if (loginForm) {
         btn.classList.add('loading');
         btn.disabled = true;
 
-        const response = await fetch('/api/auth/login/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email, password: password })
-        });
+        try {
+            const response = await fetch('/api/auth/login/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        btn.classList.remove('loading');
-        btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.disabled = false;
 
-        if (!response.ok) {
-            errorText.textContent = data.detail || 'Invalid email or password.';
+            if (!response.ok) {
+                errorText.textContent = data.detail || 'Invalid email or password.';
+                errorDiv.classList.add('show');
+            } else {
+                // 1. Save tokens
+                localStorage.setItem('access', data.access);
+                localStorage.setItem('refresh', data.refresh);
+
+                // 2. Show visual success message
+                if (successMsg) {
+                    successMsg.classList.add('show');
+                }
+
+                // 3. Clear the form
+                loginForm.reset();
+
+                // 4. Redirect to dashboard after 1 second
+                setTimeout(() => {
+                    window.location.href = '/dashboard/';
+                }, 1000);
+            }
+        } catch (error) {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            errorText.textContent = 'Network error. Please check your connection.';
             errorDiv.classList.add('show');
-        } else {
-            localStorage.setItem('access', data.access);
-            localStorage.setItem('refresh', data.refresh);
-            alert('Login successful! Tokens saved.');
-            loginForm.reset();
         }
     });
 }
 
-// --- 6. SIGNUP FORM SUBMISSION (real API call) ---
+// --- 4. SIGNUP FORM SUBMISSION ---
 const signupForm = document.getElementById('signupForm');
 if (signupForm) {
     signupForm.addEventListener('submit', async (e) => {
@@ -200,47 +212,48 @@ if (signupForm) {
         btn.classList.add('loading');
         btn.disabled = true;
 
-        const response = await fetch('/api/auth/register/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                first_name: name,
-                email: email,
-                password: pass
-            })
-        });
+        try {
+            const response = await fetch('/api/auth/register/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    password: pass
+                })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
+            btn.classList.remove('loading');
+            btn.disabled = false;
 
-        btn.classList.remove('loading');
-        btn.disabled = false;
-
-        if (!response.ok) {
-            errorText.textContent = data.email ? data.email[0] : 'Something went wrong. Please try again.';
+            if (!response.ok) {
+                errorText.textContent = data.detail || data.email || 'Signup failed.';
+                errorDiv.classList.add('show');
+            } else {
+                alert('Account created successfully! Please log in.');
+                signupView.classList.add('hidden');
+                loginView.classList.remove('hidden');
+                signupForm.reset();
+            }
+        } catch (error) {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            errorText.textContent = 'Network error. Please try again.';
             errorDiv.classList.add('show');
-        } else {
-            alert('Account created successfully!');
-            signupView.classList.add('hidden');
-            loginView.classList.remove('hidden');
-            signupForm.reset();
         }
     });
 }
 
-// --- 7. REAL-TIME ERROR CLEARING ---
-document.querySelectorAll('#loginForm input').forEach(input => {
+// --- 5. REAL-TIME ERROR CLEARING ---
+document.querySelectorAll('#loginForm input, #signupForm input').forEach(input => {
     input.addEventListener('input', () => {
-        document.getElementById('loginError').classList.remove('show');
+        const errorDiv = input.closest('form').querySelector('.error-message');
+        if (errorDiv) errorDiv.classList.remove('show');
     });
 });
 
-document.querySelectorAll('#signupForm input').forEach(input => {
-    input.addEventListener('input', () => {
-        document.getElementById('signupError').classList.remove('show');
-    });
-});
-
-// --- 8. SOCIAL BUTTON INTERACTIONS ---
+// --- 6. SOCIAL BUTTON INTERACTIONS ---
 document.querySelectorAll('.social-btn').forEach(btn => {
     btn.addEventListener('click', function () {
         const provider = this.classList.contains('facebook') ? 'Facebook' :
