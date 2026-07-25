@@ -39,8 +39,8 @@ This project is built with a strict separation of concerns. The backend acts str
 1. **Clone the repository and set up your virtual environment:**
 
    ```bash
-          git clone [https://github.com/yourusername/enterprise-task-manager.git](https://github.com/yourusername/enterprise-task-manager.git) 
-          cd django-url-shortener
+        git clone [https://github.com/yourusername/enterprise-task-manager.git](https://github.com/yourusername/enterprise-task-manager.git) 
+        cd django-url-shortener
 
 2. **Create and activate a virtual environment**
 
