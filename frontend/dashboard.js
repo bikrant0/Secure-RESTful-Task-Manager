@@ -1,205 +1,202 @@
-// ============ TASK DATA ============
-const tasksData = {
-    today: [
-        { name: 'Finish monthly reporting', due: 'Today', stage: 'in-progress', priority: 'high', team: 'Marketing 02', assignee: 1 },
-        { name: 'Contract signing', due: 'Today', stage: 'in-progress', priority: 'medium', team: 'Operations', assignee: 2 },
-        { name: 'Market overview keynote', due: 'Today', stage: 'in-progress', priority: 'high', team: 'Customer Care', assignee: 3 }
-    ],
-    tomorrow: [
-        { name: 'Brand proposal', due: 'Tomorrow', stage: 'not-started', priority: 'high', team: 'Marketing 02', assignee: 4 },
-        { name: 'Social media review', due: 'Tomorrow', stage: 'in-progress', priority: 'medium', team: 'Operations', assignee: 5 },
-        { name: 'Report - Week 30', due: 'Tomorrow', stage: 'not-started', priority: 'low', team: 'Operations', assignee: 6 }
-    ],
-    week: [
-        { name: 'Order check-ins', due: 'Wednesday', stage: 'in-progress', priority: 'medium', team: 'Retails', assignee: 7 },
-        { name: 'HR reviews', due: 'Wednesday', stage: 'not-started', priority: 'medium', team: 'People', assignee: 8 },
-        { name: 'Report - Week 30', due: 'Friday', stage: 'not-started', priority: 'low', team: 'Development', assignee: 9 }
-    ]
-};
+// ============ AUTH GUARD ============
+if (!localStorage.getItem('access')) {
+    window.location.href = '/';
+}
 
-// Fetching Data Connecting APis
+// ============ AUTH FETCH HELPER ============
 async function authFetch(url, options = {}) {
     const token = localStorage.getItem('access');
-
     const headers = {
         ...options.headers,
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
     };
-
     const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401) {
+        localStorage.clear();
+        window.location.href = '/';
+        throw new Error('Session expired');
+    }
     return response;
 }
 
-// ============ RENDER TASKS ============
-function renderTasks() {
-    ['today', 'tomorrow', 'week'].forEach(group => {
-        const container = document.getElementById(`${group}Tasks`);
-        if (!container) return;
-
-        container.innerHTML = tasksData[group].map((task, index) => `
-            <div class="task-row">
-                <div class="task-checkbox" data-group="${group}" data-index="${index}"></div>
-                <span class="task-name">${task.name}</span>
-                <span class="task-due">${task.due}</span>
-                <div class="task-stage">
-                    <span class="stage-badge ${task.stage}">${task.stage === 'in-progress' ? 'In progress' : 'Not started'}</span>
-                </div>
-                <div class="task-priority">
-                    <span class="priority-badge ${task.priority}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>
-                </div>
-                <div class="task-team">${task.team}</div>
-                <div class="task-assignee">
-                    <img src="https://i.pravatar.cc/40?img=${task.assignee + 10}" class="assignee-avatar" alt="Assignee">
-                </div>
-            </div>
-        `).join('');
-    });
-    authFetch('/api/tasks/').then(r => r.json()).then(data => console.log(data));
-
-    // Add checkbox click handlers
-    document.querySelectorAll('.task-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('click', function () {
-            this.classList.toggle('checked');
-            const taskName = this.nextElementSibling;
-            taskName.classList.toggle('completed');
-        });
-    });
-}
-
-// ============ VIEW SWITCHING ============
-const navItems = document.querySelectorAll('.nav-item[data-view]');
-const tasksView = document.getElementById('tasksView');
-const dashboardView = document.getElementById('dashboardView');
-
-navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-        e.preventDefault();
-        navItems.forEach(n => n.classList.remove('active'));
-        item.classList.add('active');
-
-        const view = item.dataset.view;
-        if (view === 'tasks') {
-            tasksView.classList.remove('hidden');
-            dashboardView.classList.add('hidden');
-        } else if (view === 'dashboard') {
-            dashboardView.classList.remove('hidden');
-            tasksView.classList.add('hidden');
-        }
-    });
+// ============ LOGOUT ============
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.clear();
+    window.location.href = '/';
 });
 
-// ============ MODAL ============
+// ============ ELEMENTS ============
+const taskList = document.getElementById('taskList');
+const emptyState = document.getElementById('emptyState');
+const errorBanner = document.getElementById('errorBanner');
+const errorBannerText = document.getElementById('errorBannerText');
+
 const modal = document.getElementById('taskModal');
 const newTaskBtn = document.getElementById('newTaskBtn');
 const modalClose = document.getElementById('modalClose');
-const createTaskBtn = document.getElementById('createTaskBtn');
-const taskNameInput = document.getElementById('taskNameInput');
+const taskForm = document.getElementById('taskForm');
+const taskFormBtn = document.getElementById('taskFormBtn');
+const formError = document.getElementById('formError');
+const formErrorText = document.getElementById('formErrorText');
 
+function showBannerError(msg) {
+    errorBannerText.textContent = msg;
+    errorBanner.classList.add('show');
+}
+
+function hideBannerError() {
+    errorBanner.classList.remove('show');
+}
+
+// ============ RENDER ONE TASK CARD ============
+function renderTask(task) {
+    const statusLabel = { TODO: 'To Do', IN_PROGRESS: 'In Progress', DONE: 'Done' }[task.status];
+    const priorityLabel = { HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low' }[task.priority];
+
+    const card = document.createElement('div');
+    card.className = 'task-card' + (task.status === 'DONE' ? ' done' : '');
+    card.dataset.id = task.id;
+
+    card.innerHTML = `
+        <div class="task-main">
+            <div class="task-title">${task.title}</div>
+            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+            <div class="task-meta">
+                <span class="badge status-${task.status}">${statusLabel}</span>
+                <span class="badge priority-${task.priority}">${priorityLabel}</span>
+                ${task.due_date ? `<span class="task-due"><i class="fas fa-calendar"></i> ${task.due_date}</span>` : ''}
+            </div>
+        </div>
+        <div class="task-actions">
+            <button class="icon-btn cycle-status" title="Cycle status (To Do → In Progress → Done)">
+                <i class="fas fa-check"></i>
+            </button>
+            <button class="icon-btn delete" title="Delete task">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+// ============ LOAD TASKS ============
+async function loadTasks() {
+    hideBannerError();
+    try {
+        const response = await authFetch('/api/tasks/');
+        const data = await response.json();
+
+        if (!response.ok) {
+            showBannerError('Could not load tasks. Please try again.');
+            return;
+        }
+
+        const tasks = data.results || data; // handles pagination wrapper if present
+        taskList.innerHTML = '';
+
+        if (tasks.length === 0) {
+            emptyState.classList.remove('hidden');
+        } else {
+            emptyState.classList.add('hidden');
+            tasks.forEach(task => taskList.appendChild(renderTask(task)));
+        }
+    } catch (error) {
+        showBannerError('Network error. Is the server running?');
+    }
+}
+
+// ============ STATUS CYCLE + DELETE (event delegation) ============
+taskList.addEventListener('click', async (e) => {
+    const card = e.target.closest('.task-card');
+    if (!card) return;
+    const id = card.dataset.id;
+
+    if (e.target.closest('.cycle-status')) {
+        const badge = card.querySelector('.status-TODO, .status-IN_PROGRESS, .status-DONE');
+        const order = ['TODO', 'IN_PROGRESS', 'DONE'];
+        const currentStatus = order.find(s => badge.classList.contains(`status-${s}`));
+        const next = order[(order.indexOf(currentStatus) + 1) % order.length];
+
+        const response = await authFetch(`/api/tasks/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: next })
+        });
+
+        if (response.ok) {
+            loadTasks();
+        } else {
+            showBannerError('Could not update task status.');
+        }
+    }
+
+    if (e.target.closest('.delete')) {
+        if (!confirm('Delete this task?')) return;
+
+        const response = await authFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
+
+        if (response.ok || response.status === 204) {
+            loadTasks();
+        } else {
+            showBannerError('Could not delete task.');
+        }
+    }
+});
+
+// ============ MODAL ============
 function openModal() {
     modal.classList.add('active');
-    setTimeout(() => taskNameInput.focus(), 100);
+    formError.classList.remove('show');
+    taskForm.reset();
 }
 
 function closeModal() {
     modal.classList.remove('active');
-    taskNameInput.value = '';
-    document.getElementById('taskDescription').value = '';
 }
 
 newTaskBtn.addEventListener('click', openModal);
 modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-});
+// ============ CREATE TASK ============
+taskForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-        closeModal();
-    }
-});
+    const title = document.getElementById('taskTitle').value.trim();
+    const description = document.getElementById('taskDescription').value.trim();
+    const status = document.getElementById('taskStatus').value;
+    const priority = document.getElementById('taskPriority').value;
+    const due_date = document.getElementById('taskDueDate').value || null;
 
-// Option buttons toggle
-document.querySelectorAll('.option-btn:not(.add):not(.add-text)').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const siblings = this.parentElement.querySelectorAll('.option-btn:not(.add):not(.add-text)');
-        siblings.forEach(s => s.classList.remove('active'));
-        this.classList.add('active');
-    });
-});
-
-// Create task
-createTaskBtn.addEventListener('click', () => {
-    const name = taskNameInput.value.trim();
-    if (!name) {
-        taskNameInput.style.borderBottom = '2px solid #ff4757';
-        setTimeout(() => taskNameInput.style.borderBottom = 'none', 1500);
+    if (!title) {
+        formErrorText.textContent = 'Title is required.';
+        formError.classList.add('show');
         return;
     }
 
-    // Get selected day
-    const activeDay = document.querySelector('.modal-row:first-child .option-btn.active');
-    const day = activeDay ? activeDay.textContent : 'Today';
+    taskFormBtn.classList.add('loading');
+    taskFormBtn.disabled = true;
 
-    // Add to appropriate group
-    const group = day === 'Today' ? 'today' : day === 'Tomorrow' ? 'tomorrow' : 'week';
-    tasksData[group].unshift({
-        name: name,
-        due: day,
-        stage: 'not-started',
-        priority: 'medium',
-        team: 'My Team',
-        assignee: Math.floor(Math.random() * 10)
+    const response = await authFetch('/api/tasks/', {
+        method: 'POST',
+        body: JSON.stringify({ title, description, status, priority, due_date })
     });
 
-    renderTasks();
+    const data = await response.json();
+
+    taskFormBtn.classList.remove('loading');
+    taskFormBtn.disabled = false;
+
+    if (!response.ok) {
+        formErrorText.textContent = data.title ? data.title[0] : 'Could not create task.';
+        formError.classList.add('show');
+        return;
+    }
+
     closeModal();
-
-    // Switch to tasks view
-    document.querySelector('[data-view="tasks"]').click();
-});
-
-// ============ TRACKING WIDGET ============
-document.querySelectorAll('.track-btn.play, .track-btn.pause').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const item = this.closest('.tracking-item');
-        const allItems = document.querySelectorAll('.tracking-item');
-
-        allItems.forEach(i => {
-            i.classList.remove('active');
-            const playBtn = i.querySelector('.track-btn.play, .track-btn.pause');
-            if (playBtn) {
-                playBtn.className = 'track-btn play';
-                playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            }
-        });
-
-        if (this.classList.contains('play')) {
-            item.classList.add('active');
-            this.className = 'track-btn pause';
-            this.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-            this.className = 'track-btn play';
-            this.innerHTML = '<i class="fas fa-play"></i>';
-        }
-    });
-});
-
-// ============ WIDGET TASK CHECKBOXES ============
-document.querySelectorAll('.widget-task .custom-check input').forEach(checkbox => {
-    checkbox.addEventListener('change', function () {
-        const taskName = this.closest('.widget-task').querySelector('.task-name');
-        if (this.checked) {
-            taskName.classList.add('done-text');
-        } else {
-            taskName.classList.remove('done-text');
-        }
-    });
+    loadTasks();
 });
 
 // ============ INITIALIZE ============
-renderTasks();
-
-console.log('Organizo Dashboard Loaded');
-
+loadTasks();

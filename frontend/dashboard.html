@@ -5,398 +5,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager</title>
+    <title>My Tasks - Enterprise Task Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'dashboard.css' %}">
 </head>
 
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-icon">US</div>
-                <span class="logo-text">Task</span>
+    <div class="dashboard-wrapper">
+        <header class="dashboard-header">
+            <h1><i class="fas fa-check-circle"></i> My Tasks</h1>
+            <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="toolbar">
+                <button id="newTaskBtn" class="btn-submit btn-new-task">
+                    <i class="fas fa-plus"></i> New Task
+                </button>
             </div>
 
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item" data-view="dashboard">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item active" data-view="tasks">
-                    <i class="fas fa-check-circle"></i>
-                    <span>My tasks</span>
-                </a>
-                <a href="#" class="nav-item" data-view="notifications">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                </a>
-            </nav>
-
-            <div class="sidebar-bottom">
-                <a href="#" class="nav-item">
-                    <i class="fas fa-sliders-h"></i>
-                    <span>Settings</span>
-                </a>
-                <a href="#" class="nav-item logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Log out</span>
-                </a>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Bar -->
-            <header class="top-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search">
-                </div>
-                <div class="top-actions">
-                    <button class="btn-new-task" id="newTaskBtn">
-                        <i class="fas fa-plus"></i>
-                        New task
-                    </button>
-                    <button class="icon-btn">
-                        <i class="far fa-envelope"></i>
-                    </button>
-                    <div class="profile-avatar">
-                        <img src="https://i.pravatar.cc/40?img=12" alt="Profile">
-                    </div>
-                </div>
-            </header>
-
-            <!-- My Tasks View -->
-            <div class="view" id="tasksView">
-                <div class="task-group">
-                    <div class="task-group-header">
-                        <h2>Today</h2>
-                        <div class="task-columns">
-                            <span>Due Date</span>
-                            <span>Stage</span>
-                            <span>Priority</span>
-                            <span>Team</span>
-                            <span>Assignee</span>
-                        </div>
-                    </div>
-                    <div class="task-list" id="todayTasks">
-                        <!-- Tasks injected by JS -->
-                    </div>
-                </div>
-
-                <div class="task-group">
-                    <div class="task-group-header">
-                        <h2>Tomorrow</h2>
-                        <div class="task-columns">
-                            <span>Due Date</span>
-                            <span>Stage</span>
-                            <span>Priority</span>
-                            <span>Team</span>
-                            <span>Assignee</span>
-                        </div>
-                    </div>
-                    <div class="task-list" id="tomorrowTasks">
-                        <!-- Tasks injected by JS -->
-                    </div>
-                </div>
-
-                <div class="task-group">
-                    <div class="task-group-header">
-                        <h2>This week</h2>
-                        <div class="task-columns">
-                            <span>Due Date</span>
-                            <span>Stage</span>
-                            <span>Priority</span>
-                            <span>Team</span>
-                            <span>Assignee</span>
-                        </div>
-                    </div>
-                    <div class="task-list" id="weekTasks">
-                        <!-- Tasks injected by JS -->
-                    </div>
-                </div>
+            <div class="error-message" id="errorBanner">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorBannerText">Error</span>
             </div>
 
-            <!-- Dashboard View -->
-            <div class="view hidden" id="dashboardView">
-                <div class="dashboard-grid">
-                    <!-- Calendar Widget -->
-                    <div class="widget calendar-widget">
-                        <div class="widget-header">
-                            <h3>March 2022</h3>
-                            <div class="calendar-nav">
-                                <button><i class="fas fa-chevron-left"></i></button>
-                                <button><i class="fas fa-chevron-right"></i></button>
-                            </div>
-                        </div>
-                        <div class="calendar-grid">
-                            <div class="cal-day-name">Mo</div>
-                            <div class="cal-day-name">Tu</div>
-                            <div class="cal-day-name">We</div>
-                            <div class="cal-day-name">Th</div>
-                            <div class="cal-day-name">Fr</div>
-                            <div class="cal-day-name">Sa</div>
-                            <div class="cal-day-name">Su</div>
-                            <div class="cal-day muted">28</div>
-                            <div class="cal-day muted">1</div>
-                            <div class="cal-day muted">2</div>
-                            <div class="cal-day today">3</div>
-                            <div class="cal-day">4</div>
-                            <div class="cal-day">5</div>
-                            <div class="cal-day">6</div>
-                            <div class="cal-day">7</div>
-                            <div class="cal-day">8</div>
-                            <div class="cal-day">9</div>
-                            <div class="cal-day">10</div>
-                            <div class="cal-day">11</div>
-                            <div class="cal-day">12</div>
-                            <div class="cal-day">13</div>
-                            <div class="cal-day">14</div>
-                            <div class="cal-day">15</div>
-                            <div class="cal-day">16</div>
-                            <div class="cal-day">17</div>
-                            <div class="cal-day">18</div>
-                            <div class="cal-day">19</div>
-                            <div class="cal-day">20</div>
-                            <div class="cal-day">21</div>
-                            <div class="cal-day">22</div>
-                            <div class="cal-day">23</div>
-                            <div class="cal-day">24</div>
-                            <div class="cal-day">25</div>
-                            <div class="cal-day">26</div>
-                            <div class="cal-day">27</div>
-                            <div class="cal-day">28</div>
-                            <div class="cal-day">29</div>
-                            <div class="cal-day">30</div>
-                            <div class="cal-day">31</div>
-                            <div class="cal-day muted">1</div>
-                            <div class="cal-day muted">2</div>
-                            <div class="cal-day muted">3</div>
-                        </div>
-                    </div>
+            <div id="taskList" class="task-list"></div>
 
-                    <!-- My Tasks Widget -->
-                    <div class="widget tasks-widget">
-                        <div class="widget-header">
-                            <h3>My tasks (05)</h3>
-                            <button class="widget-menu"><i class="fas fa-ellipsis-v"></i></button>
-                        </div>
-                        <div class="widget-task-list">
-                            <div class="widget-task done">
-                                <label class="custom-check"><input type="checkbox" checked><span
-                                        class="checkmark"></span></label>
-                                <span class="task-name done-text">Finish monthly reporting</span>
-                                <span class="task-due">Today</span>
-                            </div>
-                            <div class="widget-task">
-                                <label class="custom-check"><input type="checkbox"><span
-                                        class="checkmark"></span></label>
-                                <span class="task-name">Contract signing</span>
-                                <span class="task-due">Today</span>
-                            </div>
-                            <div class="widget-task">
-                                <label class="custom-check"><input type="checkbox"><span
-                                        class="checkmark"></span></label>
-                                <span class="task-name">Market overview keyno...</span>
-                                <span class="task-due">Tomorrow</span>
-                            </div>
-                            <div class="widget-task">
-                                <label class="custom-check"><input type="checkbox"><span
-                                        class="checkmark"></span></label>
-                                <span class="task-name">Project research</span>
-                                <span class="task-due">Tomorrow</span>
-                            </div>
-                            <div class="widget-task">
-                                <label class="custom-check"><input type="checkbox"><span
-                                        class="checkmark"></span></label>
-                                <span class="task-name">Prepare invoices</span>
-                                <span class="task-due">This week</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- New Comments Widget -->
-                    <div class="widget comments-widget">
-                        <div class="widget-header">
-                            <h3>New comments</h3>
-                        </div>
-                        <div class="comment-list">
-                            <div class="comment-item">
-                                <div class="comment-content">
-                                    <strong>Market research</strong>
-                                    <p>Find my keynote attached...</p>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                            <div class="comment-item">
-                                <div class="comment-content">
-                                    <strong>Market research</strong>
-                                    <p>I've added the data. Let's check it out toge...</p>
-                                </div>
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-                        <button class="add-btn"><i class="fas fa-plus"></i> Add</button>
-                    </div>
-
-                    <!-- Categories Widget -->
-                    <div class="widget categories-widget">
-                        <div class="widget-header">
-                            <h3>My categories</h3>
-                            <button class="widget-menu"><i class="fas fa-ellipsis-v"></i></button>
-                        </div>
-                        <div class="category-list">
-                            <div class="category-item">
-                                <i class="fas fa-briefcase"></i>
-                                <span>Work</span>
-                                <div class="avatar-stack">
-                                    <img src="https://i.pravatar.cc/30?img=1">
-                                    <img src="https://i.pravatar.cc/30?img=2">
-                                </div>
-                            </div>
-                            <div class="category-item">
-                                <i class="fas fa-users"></i>
-                                <span>Family</span>
-                                <div class="avatar-stack">
-                                    <img src="https://i.pravatar.cc/30?img=3">
-                                    <img src="https://i.pravatar.cc/30?img=4">
-                                    <img src="https://i.pravatar.cc/30?img=5">
-                                </div>
-                            </div>
-                            <div class="category-item">
-                                <i class="fas fa-palette"></i>
-                                <span>Freelance work 01</span>
-                                <div class="avatar-stack">
-                                    <img src="https://i.pravatar.cc/30?img=6">
-                                    <img src="https://i.pravatar.cc/30?img=7">
-                                </div>
-                            </div>
-                            <div class="category-item">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span>Conference planning</span>
-                                <div class="avatar-stack">
-                                    <img src="https://i.pravatar.cc/30?img=8">
-                                </div>
-                            </div>
-                        </div>
-                        <button class="add-btn"><i class="fas fa-plus"></i> Add more</button>
-                    </div>
-
-                    <!-- Tracking Widget -->
-                    <div class="widget tracking-widget">
-                        <div class="widget-header">
-                            <h3>My tracking</h3>
-                        </div>
-                        <div class="tracking-list">
-                            <div class="tracking-item active">
-                                <i class="fas fa-clock"></i>
-                                <span class="track-name">Create wireframe</span>
-                                <span class="track-time">1h 25m 30s</span>
-                                <button class="track-btn pause"><i class="fas fa-pause"></i></button>
-                                <button class="track-btn more"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                            <div class="tracking-item">
-                                <i class="fas fa-clock"></i>
-                                <span class="track-name">Slack logo design</span>
-                                <span class="track-time">30m 18s</span>
-                                <button class="track-btn play"><i class="fas fa-play"></i></button>
-                                <button class="track-btn more"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                            <div class="tracking-item">
-                                <i class="fas fa-clock"></i>
-                                <span class="track-name">Dashboard design</span>
-                                <span class="track-time">1h 48m 22s</span>
-                                <button class="track-btn play"><i class="fas fa-play"></i></button>
-                                <button class="track-btn more"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                            <div class="tracking-item">
-                                <i class="fas fa-clock"></i>
-                                <span class="track-name">Create wireframe</span>
-                                <span class="track-time">17m 1s</span>
-                                <button class="track-btn play"><i class="fas fa-play"></i></button>
-                                <button class="track-btn more"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                            <div class="tracking-item">
-                                <i class="fas fa-clock"></i>
-                                <span class="track-name">Mood tracker</span>
-                                <span class="track-time">15h 5m 58s</span>
-                                <button class="track-btn play"><i class="fas fa-play"></i></button>
-                                <button class="track-btn more"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Widget -->
-                    <div class="widget add-widget">
-                        <button class="add-widget-btn">
-                            <i class="fas fa-plus"></i>
-                            Add widget
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
+            <p id="emptyState" class="empty-state hidden">No tasks yet. Create your first one!</p>
+        </div>
     </div>
 
     <!-- New Task Modal -->
     <div class="modal-overlay" id="taskModal">
-        <div class="modal">
+        <div class="modal-container">
+            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
             <div class="modal-header">
-                <i class="far fa-clipboard modal-icon"></i>
-                <input type="text" class="modal-title-input" placeholder="Name of task" id="taskNameInput">
-                <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+                <h3>New Task</h3>
             </div>
 
-            <div class="modal-body">
-                <div class="modal-row">
-                    <div class="modal-label"><i class="far fa-clock"></i> Day</div>
-                    <div class="modal-options">
-                        <button class="option-btn active">Today</button>
-                        <button class="option-btn">Tomorrow</button>
-                        <button class="option-btn add"><i class="fas fa-plus"></i></button>
+            <div class="error-message" id="formError">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="formErrorText">Error</span>
+            </div>
+
+            <form id="taskForm">
+                <div class="form-group">
+                    <label>Title</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="taskTitle" placeholder="What needs to be done?" required>
                     </div>
                 </div>
 
-                <div class="modal-row">
-                    <div class="modal-label"><i class="far fa-bell"></i> Notification</div>
-                    <div class="modal-options">
-                        <button class="option-btn">In 1 hour</button>
-                        <button class="option-btn add"><i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-
-                <div class="modal-row">
-                    <div class="modal-label"><i class="fas fa-flag"></i> Priority</div>
-                    <div class="modal-options">
-                        <button class="option-btn add-text"><i class="fas fa-plus"></i> Add priority</button>
-                    </div>
-                </div>
-
-                <div class="modal-row">
-                    <div class="modal-label"><i class="fas fa-tag"></i> Tags</div>
-                    <div class="modal-options">
-                        <button class="option-btn add-text"><i class="fas fa-plus"></i> Add tags</button>
-                    </div>
-                </div>
-
-                <div class="modal-row">
-                    <div class="modal-label"><i class="far fa-user"></i> Assign</div>
-                    <div class="modal-options">
-                        <button class="option-btn add-text"><i class="fas fa-plus"></i> Add assignee</button>
-                    </div>
-                </div>
-
-                <div class="modal-description">
+                <div class="form-group">
                     <label>Description</label>
-                    <textarea id="taskDescription" placeholder=""></textarea>
+                    <div class="input-wrapper">
+                        <textarea id="taskDescription" placeholder="Optional details" rows="3"></textarea>
+                    </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <button class="btn-create" id="createTaskBtn">Create task</button>
-            </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="taskStatus">
+                            <option value="TODO">To Do</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="DONE">Done</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="taskPriority">
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="HIGH">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Due Date</label>
+                    <div class="input-wrapper">
+                        <input type="date" id="taskDueDate">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="taskFormBtn">
+                    Save Task
+                    <div class="spinner"></div>
+                </button>
+            </form>
         </div>
     </div>
 
