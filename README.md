@@ -26,6 +26,7 @@ A full-stack task management application built with Django REST Framework and va
 
 ## Tech Stack
 
+<<<<<<< HEAD
 | Layer | Technology |
 |---|---|
 | Backend | Django, Django REST Framework |
@@ -33,6 +34,11 @@ A full-stack task management application built with Django REST Framework and va
 | Database | SQLite (local), PostgreSQL (production, via `dj-database-url`) |
 | Frontend | HTML, CSS, vanilla JavaScript (`fetch` API, no framework) |
 | Version control | Git / GitHub |
+=======
+   ```bash
+        git clone [https://github.com/yourusername/enterprise-task-manager.git](https://github.com/yourusername/enterprise-task-manager.git) 
+        cd django-url-shortener
+>>>>>>> 49e13507e1fa44ed7895825aa5531a8c53d5737f
 
 ---
 

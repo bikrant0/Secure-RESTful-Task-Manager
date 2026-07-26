@@ -3,6 +3,10 @@ if (!localStorage.getItem('access')) {
     window.location.href = '/';
 }
 
+// NOTE: your login handler in script.js must also save the email:
+// localStorage.setItem('email', email);   <-- add this line right after
+// localStorage.setItem('refresh', data.refresh); in the login success branch
+
 // ============ AUTH FETCH HELPER ============
 async function authFetch(url, options = {}) {
     const token = localStorage.getItem('access');
@@ -26,6 +30,10 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.clear();
     window.location.href = '/';
 });
+
+// ============ CURRENT USER (single-user system — tasks always belong to whoever's logged in) ============
+const currentUserEmail = localStorage.getItem('email') || 'you';
+document.getElementById('welcomeUser').textContent = `Logged in as ${currentUserEmail}`;
 
 // ============ ELEMENTS ============
 const taskList = document.getElementById('taskList');
@@ -67,6 +75,7 @@ function renderTask(task) {
                 <span class="badge status-${task.status}">${statusLabel}</span>
                 <span class="badge priority-${task.priority}">${priorityLabel}</span>
                 ${task.due_date ? `<span class="task-due"><i class="fas fa-calendar"></i> ${task.due_date}</span>` : ''}
+                <span class="task-assignee"><i class="fas fa-user"></i> ${currentUserEmail}</span>
             </div>
         </div>
         <div class="task-actions">
