@@ -9,9 +9,9 @@ class Task(models.Model):
         ]
 
     PRIORITY_CHOICES = [
-    ('HIGH', 'Very Important'),
-    ('MEDIUM', 'Important'),
-    ('LOW', 'Less Important'),
+    ('High' 'Very Important'),
+    ('Medium', 'Important'),
+    ('Low', 'Less Important'),
     ]
     
     title = models.CharField(max_length=255)

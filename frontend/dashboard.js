@@ -3,9 +3,8 @@ if (!localStorage.getItem('access')) {
     window.location.href = '/';
 }
 
-// NOTE: your login handler in script.js must also save the email:
-// localStorage.setItem('email', email);   <-- add this line right after
-// localStorage.setItem('refresh', data.refresh); in the login success branch
+    localStorage.setItem('email', email);   
+    localStorage.setItem('refresh', data.refresh); 
 
 // ============ AUTH FETCH HELPER ============
 async function authFetch(url, options = {}) {
