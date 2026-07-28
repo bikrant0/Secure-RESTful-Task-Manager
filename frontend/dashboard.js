@@ -3,19 +3,22 @@ if (!localStorage.getItem('access')) {
     window.location.href = '/';
 }
 
-    localStorage.setItem('email', email);   
-    localStorage.setItem('refresh', data.refresh); 
-
 // ============ AUTH FETCH HELPER ============
 async function authFetch(url, options = {}) {
     const token = localStorage.getItem('access');
+    if (!token) {
+        window.location.href = '/';
+        return;
+    }
+    
     const headers = {
-        ...options.headers,
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        ...options.headers
     };
-    const response = await fetch(url, { ...options, headers });
 
+    const response = await fetch(url, { ...options, headers });
+    
     if (response.status === 401) {
         localStorage.clear();
         window.location.href = '/';
@@ -30,7 +33,7 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     window.location.href = '/';
 });
 
-// ============ CURRENT USER (single-user system — tasks always belong to whoever's logged in) ============
+// ============ CURRENT USER ============
 const currentUserEmail = localStorage.getItem('email') || 'you';
 document.getElementById('welcomeUser').textContent = `Logged in as ${currentUserEmail}`;
 
@@ -39,7 +42,6 @@ const taskList = document.getElementById('taskList');
 const emptyState = document.getElementById('emptyState');
 const errorBanner = document.getElementById('errorBanner');
 const errorBannerText = document.getElementById('errorBannerText');
-
 const modal = document.getElementById('taskModal');
 const newTaskBtn = document.getElementById('newTaskBtn');
 const modalClose = document.getElementById('modalClose');
@@ -51,41 +53,53 @@ const formErrorText = document.getElementById('formErrorText');
 function showBannerError(msg) {
     errorBannerText.textContent = msg;
     errorBanner.classList.add('show');
+    setTimeout(() => hideBannerError(), 5000);
 }
 
 function hideBannerError() {
     errorBanner.classList.remove('show');
 }
 
+// ============ DISABLE PAST DATES (TIME TRAVEL FIX) ============
+document.addEventListener('DOMContentLoaded', () => {
+    const dateInput = document.getElementById('taskDueDate');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+    }
+});
+
 // ============ RENDER ONE TASK CARD ============
 function renderTask(task) {
     const statusLabel = { TODO: 'To Do', IN_PROGRESS: 'In Progress', DONE: 'Done' }[task.status];
     const priorityLabel = { HIGH: 'High', MEDIUM: 'Medium', LOW: 'Low' }[task.priority];
-
+    
     const card = document.createElement('div');
     card.className = 'task-card' + (task.status === 'DONE' ? ' done' : '');
     card.dataset.id = task.id;
+    
+    const descHtml = task.description ? `<div class="task-description">${task.description}</div>` : '';
+    const dueHtml = task.due_date ? `<span class="task-due"><i class="fas fa-calendar"></i> ${task.due_date}</span>` : '';
 
     card.innerHTML = `
         <div class="task-main">
             <div class="task-title">${task.title}</div>
-            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+            ${descHtml}
             <div class="task-meta">
                 <span class="badge status-${task.status}">${statusLabel}</span>
                 <span class="badge priority-${task.priority}">${priorityLabel}</span>
-                ${task.due_date ? `<span class="task-due"><i class="fas fa-calendar"></i> ${task.due_date}</span>` : ''}
+                ${dueHtml}
                 <span class="task-assignee"><i class="fas fa-user"></i> ${currentUserEmail}</span>
             </div>
         </div>
         <div class="task-actions">
-            <button class="icon-btn cycle-status" title="Cycle status (To Do → In Progress → Done)">
+            <button class="icon-btn cycle-status" title="Cycle status">
                 <i class="fas fa-check"></i>
             </button>
             <button class="icon-btn delete" title="Delete task">
                 <i class="fas fa-trash"></i>
             </button>
-        </div>
-    `;
+        </div>`;
     return card;
 }
 
@@ -94,16 +108,12 @@ async function loadTasks() {
     hideBannerError();
     try {
         const response = await authFetch('/api/tasks/');
+        if (!response.ok) throw new Error('Could not load tasks.');
+        
         const data = await response.json();
-
-        if (!response.ok) {
-            showBannerError('Could not load tasks. Please try again.');
-            return;
-        }
-
-        const tasks = data.results || data; // handles pagination wrapper if present
+        const tasks = data.results || data;
+        
         taskList.innerHTML = '';
-
         if (tasks.length === 0) {
             emptyState.classList.remove('hidden');
         } else {
@@ -111,42 +121,45 @@ async function loadTasks() {
             tasks.forEach(task => taskList.appendChild(renderTask(task)));
         }
     } catch (error) {
+        console.error(error);
         showBannerError('Network error. Is the server running?');
     }
 }
 
-// ============ STATUS CYCLE + DELETE (event delegation) ============
+// ============ STATUS CYCLE + DELETE ============
 taskList.addEventListener('click', async (e) => {
     const card = e.target.closest('.task-card');
     if (!card) return;
     const id = card.dataset.id;
 
+  
     if (e.target.closest('.cycle-status')) {
         const badge = card.querySelector('.status-TODO, .status-IN_PROGRESS, .status-DONE');
         const order = ['TODO', 'IN_PROGRESS', 'DONE'];
         const currentStatus = order.find(s => badge.classList.contains(`status-${s}`));
         const next = order[(order.indexOf(currentStatus) + 1) % order.length];
 
-        const response = await authFetch(`/api/tasks/${id}/`, {
-            method: 'PATCH',
-            body: JSON.stringify({ status: next })
-        });
-
-        if (response.ok) {
-            loadTasks();
-        } else {
+        try {
+            const response = await authFetch(`/api/tasks/${id}/`, {
+                method: 'PATCH',
+                body: JSON.stringify({ status: next })
+            });
+            if (response.ok) loadTasks();
+            else showBannerError('Could not update task status.');
+        } catch (err) {
             showBannerError('Could not update task status.');
         }
     }
 
     if (e.target.closest('.delete')) {
-        if (!confirm('Delete this task?')) return;
-
-        const response = await authFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
-
-        if (response.ok || response.status === 204) {
-            loadTasks();
-        } else {
+        const userConfirmed = confirm("Are you sure you want to delete this task? This action cannot be undone.");
+        if (!userConfirmed) return; 
+        
+        try {
+            const response = await authFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
+            if (response.ok || response.status === 204) loadTasks();
+            else showBannerError('Could not delete task. Check permissions.');
+        } catch (err) {
             showBannerError('Could not delete task.');
         }
     }
@@ -165,17 +178,25 @@ function closeModal() {
 
 newTaskBtn.addEventListener('click', openModal);
 modalClose.addEventListener('click', closeModal);
-modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+});
 
 // ============ CREATE TASK ============
 taskForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    formError.classList.remove('show');
+
 
     const title = document.getElementById('taskTitle').value.trim();
     const description = document.getElementById('taskDescription').value.trim();
-    const status = document.getElementById('taskStatus').value;
-    const priority = document.getElementById('taskPriority').value;
-    const due_date = document.getElementById('taskDueDate').value || null;
+    const status = document.getElementById('taskStatus').value.trim();
+    const priority = document.getElementById('taskPriority').value.trim();
+    const dueDateInput = document.getElementById('taskDueDate').value;
+    const due_date = dueDateInput ? dueDateInput : null;
+
+    const payload = { title, description, status, priority, due_date };
+    console.log("Sending payload to server:", payload);
 
     if (!title) {
         formErrorText.textContent = 'Title is required.';
@@ -186,24 +207,43 @@ taskForm.addEventListener('submit', async (e) => {
     taskFormBtn.classList.add('loading');
     taskFormBtn.disabled = true;
 
-    const response = await authFetch('/api/tasks/', {
-        method: 'POST',
-        body: JSON.stringify({ title, description, status, priority, due_date })
-    });
+    try {
+        const response = await authFetch('/api/tasks/', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
 
-    const data = await response.json();
+        // Read response as text FIRST to avoid JSON parsing crashes on 400 errors
+        const responseText = await response.text();
+        console.log("Server responded with:", response.status, responseText);
 
-    taskFormBtn.classList.remove('loading');
-    taskFormBtn.disabled = false;
+        if (!response.ok) {
+            let errorMsg = 'Could not create task.';
+            try {
+                const data = JSON.parse(responseText);
+                // Extract the first error message from Django DRF format
+                if (data.title) errorMsg = Array.isArray(data.title) ? data.title[0] : data.title;
+                else if (data.status) errorMsg = Array.isArray(data.status) ? data.status[0] : data.status;
+                else if (data.priority) errorMsg = Array.isArray(data.priority) ? data.priority[0] : data.priority;
+                else if (data.detail) errorMsg = data.detail;
+            } catch (e) {
+                errorMsg = responseText || errorMsg;
+            }
+            throw new Error(errorMsg);
+        }
 
-    if (!response.ok) {
-        formErrorText.textContent = data.title ? data.title[0] : 'Could not create task.';
+        closeModal();
+        loadTasks();
+        
+    } catch (error) {
+        console.error("Create Task Error:", error);
+        formErrorText.textContent = error.message;
         formError.classList.add('show');
-        return;
+    } finally {
+        // ALWAYS reset the button state
+        taskFormBtn.classList.remove('loading');
+        taskFormBtn.disabled = false;
     }
-
-    closeModal();
-    loadTasks();
 });
 
 // ============ INITIALIZE ============

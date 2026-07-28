@@ -4,20 +4,24 @@ function validateEmail(email) {
     return re.test(email);
 }
 
-function togglePassword(inputId, toggleBtn) {
-    const input = document.getElementById(inputId);
-    const icon = toggleBtn.querySelector('i');
+const passwordInput = document.getElementById("passwordInput");
+const toggleBtn = document.getElementById("toggleBtn");
+const eyeIcon = document.getElementById("eyeIcon");
 
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-}
+toggleBtn.addEventListener("click", () => {
+  // Toggle input type
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    // Update icon to 'eye-slash' (hide)
+    eyeIcon.classList.remove("fa-eye");
+    eyeIcon.classList.add("fa-eye-slash");
+  } else {
+    passwordInput.type = "password";
+    // Update icon to 'eye' (show)
+    eyeIcon.classList.remove("fa-eye-slash");
+    eyeIcon.classList.add("fa-eye");
+  }
+});   
 
 // --- 1. VIEW SWITCHING (LOGIN <-> SIGNUP) ---
 const loginView = document.getElementById('loginView');
