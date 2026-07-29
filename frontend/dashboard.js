@@ -128,12 +128,17 @@ async function loadTasks() {
 
 // ============ STATUS CYCLE + DELETE ============
 taskList.addEventListener('click', async (e) => {
+    // 1. Finds which task card was clicked
     const card = e.target.closest('.task-card');
     if (!card) return;
+    
+    // 2. Grabs the Database ID from the card
     const id = card.dataset.id;
 
-  
+    // --- UPDATE LOGIC (PATCH) ---
     if (e.target.closest('.cycle-status')) {
+        console.log(`Trying to UPDATE task ID: ${id}`); // <--- DEBUG PRINT
+
         const badge = card.querySelector('.status-TODO, .status-IN_PROGRESS, .status-DONE');
         const order = ['TODO', 'IN_PROGRESS', 'DONE'];
         const currentStatus = order.find(s => badge.classList.contains(`status-${s}`));
@@ -144,23 +149,38 @@ taskList.addEventListener('click', async (e) => {
                 method: 'PATCH',
                 body: JSON.stringify({ status: next })
             });
-            if (response.ok) loadTasks();
-            else showBannerError('Could not update task status.');
+            
+            if (response.ok) {
+                console.log("Update Success!"); // <--- DEBUG PRINT
+                loadTasks();
+            } else {
+                console.error("Update Failed. Django says:", await response.text()); // <--- SHOW DJANGO ERROR
+                showBannerError('Could not update task status.');
+            }
         } catch (err) {
-            showBannerError('Could not update task status.');
+            console.error("Network Error during Update:", err);
         }
     }
 
+    // --- DELETE LOGIC (DELETE) ---
     if (e.target.closest('.delete')) {
+        console.log(`Trying to DELETE task ID: ${id}`); // <--- DEBUG PRINT
+
         const userConfirmed = confirm("Are you sure you want to delete this task? This action cannot be undone.");
         if (!userConfirmed) return; 
         
         try {
             const response = await authFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
-            if (response.ok || response.status === 204) loadTasks();
-            else showBannerError('Could not delete task. Check permissions.');
+            
+            if (response.ok || response.status === 204) {
+                console.log("Delete Success!"); // <--- DEBUG PRINT
+                loadTasks();
+            } else {
+                console.error("Delete Failed. Django says:", await response.text()); // <--- SHOW DJANGO ERROR
+                showBannerError('Could not delete task. Check permissions.');
+            }
         } catch (err) {
-            showBannerError('Could not delete task.');
+            console.error("Network Error during Delete:", err);
         }
     }
 });

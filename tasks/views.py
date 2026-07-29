@@ -6,9 +6,6 @@ from .serializers import TaskSerializer, NoteSerializer
 from .pagination import TaskPagination
 from django.shortcuts import render, get_object_or_404
 
-
-
-
 class TaskListCreateView(generics.ListCreateAPIView):
     
     serializer_class = TaskSerializer
@@ -30,6 +27,9 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user)
     
 
 class NoteCreateView(generics.CreateAPIView):
