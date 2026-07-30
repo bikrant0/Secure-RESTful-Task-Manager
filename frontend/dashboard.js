@@ -1,6 +1,6 @@
 // ============ AUTH GUARD ============
 if (!localStorage.getItem('access')) {
-    window.location.href = '/';
+    window.location.href = 'index.html'; 
 }
 
 // ============ AUTH FETCH HELPER ============
