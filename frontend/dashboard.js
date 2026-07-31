@@ -266,5 +266,54 @@ taskForm.addEventListener('submit', async (e) => {
     }
 });
 
+// ==== THE DEBOUNCER ===
+let currentTaskID = null ;
+const notesTextarea = document.getElementById('notesTextarea')
+const saveStatus = document.getElementById('saveStatus');
+let saveTimeout; // This holds our timer
+
+if (notesTextarea) {
+    notesTextarea.addEventListener('input', (e) => {
+        clearTimeout(saveTimeout);
+
+        saveStatus.textContent = 'Saving...';
+        saveStatus.style.color = '#999';
+
+        saveTimeout = setTimeout(async () => {
+            const content = e.target.value.trim();
+            
+            if (!content || !currentTaskId) {
+                saveStatus.textContent = '';
+                return;
+            }
+
+            try {
+                const response = await authFetch(`/api/tasks/${currentTaskId}/notes/`, {
+                    method: 'POST',
+                    body: JSON.stringify({ content: content })
+                });
+
+                if (response.ok) {
+                    saveStatus.textContent = 'Saved ✓';
+                    saveStatus.style.color = '#2ed573'; 
+
+                    setTimeout(() => {
+                        if (saveStatus.textContent === 'Saved ✓') {
+                            saveStatus.textContent = '';
+                        }
+                    }, 2000);
+                } else {
+                    saveStatus.textContent = 'Failed to save';
+                    saveStatus.style.color = '#ff4757'; 
+                }
+            } catch (error) {
+                console.error('Note auto-save error:', error);
+                saveStatus.textContent = 'Network error';
+                saveStatus.style.color = '#ff4757';
+            }
+        }, 1000); // 1000 milliseconds = 1 second wait time
+    });
+}
+
 // ============ INITIALIZE ============
 loadTasks();

@@ -394,3 +394,30 @@ body {
         gap: 0;
     }
 }
+
+#notesTextarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 14px 15px;
+    border: 2px solid #e0e0e0; 
+    border-radius: 12px; 
+    font-size: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+    resize: vertical;
+    background: #fff;
+}
+
+#notesTextarea:focus {
+    border-color: #F5D547; 
+}
+
+.save-status {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: right;
+    min-height: 15px; 
+}
