@@ -421,3 +421,35 @@ body {
     text-align: right;
     min-height: 15px; 
 }
+
+
+.assignee-select {
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    background: #fff; /* Force white background */
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 150px;
+    color: #1a1a1a;
+    appearance: none; /* Remove default browser styling */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.assignee-select:focus {
+    border-color: #F5D547;
+    background: #fff; /* Keep white on focus */
+}
+
+.assignee-select option {
+    background: #fff;
+    color: #1a1a1a;
+    padding: 10px;
+}
+
+.assignee-select option:hover {
+    background: #F5D547;
+}

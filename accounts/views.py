@@ -24,6 +24,6 @@ class UserListView(generics.ListAPIView):
 
         data = [{"id":user.id,
                  "email": user.email,
-                 "role": user.role
+                 "role": user.role if hasattr(user, 'role') else 'JUNIOR'
                  } for user in queryset]
         return Response(data)

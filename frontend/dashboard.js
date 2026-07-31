@@ -137,7 +137,7 @@ taskList.addEventListener('click', async (e) => {
 
     // --- UPDATE LOGIC (PATCH) ---
     if (e.target.closest('.cycle-status')) {
-        console.log(`Trying to UPDATE task ID: ${id}`); // <--- DEBUG PRINT
+        console.log(`Trying to UPDATE task ID: ${id}`); 
 
         const badge = card.querySelector('.status-TODO, .status-IN_PROGRESS, .status-DONE');
         const order = ['TODO', 'IN_PROGRESS', 'DONE'];
@@ -151,10 +151,10 @@ taskList.addEventListener('click', async (e) => {
             });
             
             if (response.ok) {
-                console.log("Update Success!"); // <--- DEBUG PRINT
+                console.log("Update Success!"); 
                 loadTasks();
             } else {
-                console.error("Update Failed. Django says:", await response.text()); // <--- SHOW DJANGO ERROR
+                console.error("Update Failed. Django says:", await response.text()); 
                 showBannerError('Could not update task status.');
             }
         } catch (err) {
@@ -164,7 +164,7 @@ taskList.addEventListener('click', async (e) => {
 
     // --- DELETE LOGIC (DELETE) ---
     if (e.target.closest('.delete')) {
-        console.log(`Trying to DELETE task ID: ${id}`); // <--- DEBUG PRINT
+        console.log(`Trying to DELETE task ID: ${id}`); 
 
         const userConfirmed = confirm("Are you sure you want to delete this task? This action cannot be undone.");
         if (!userConfirmed) return; 
@@ -173,10 +173,10 @@ taskList.addEventListener('click', async (e) => {
             const response = await authFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
             
             if (response.ok || response.status === 204) {
-                console.log("Delete Success!"); // <--- DEBUG PRINT
+                console.log("Delete Success!"); 
                 loadTasks();
             } else {
-                console.error("Delete Failed. Django says:", await response.text()); // <--- SHOW DJANGO ERROR
+                console.error("Delete Failed. Django says:", await response.text()); 
                 showBannerError('Could not delete task. Check permissions.');
             }
         } catch (err) {
@@ -233,7 +233,6 @@ taskForm.addEventListener('submit', async (e) => {
             body: JSON.stringify(payload)
         });
 
-        // Read response as text FIRST to avoid JSON parsing crashes on 400 errors
         const responseText = await response.text();
         console.log("Server responded with:", response.status, responseText);
 
@@ -241,7 +240,6 @@ taskForm.addEventListener('submit', async (e) => {
             let errorMsg = 'Could not create task.';
             try {
                 const data = JSON.parse(responseText);
-                // Extract the first error message from Django DRF format
                 if (data.title) errorMsg = Array.isArray(data.title) ? data.title[0] : data.title;
                 else if (data.status) errorMsg = Array.isArray(data.status) ? data.status[0] : data.status;
                 else if (data.priority) errorMsg = Array.isArray(data.priority) ? data.priority[0] : data.priority;
@@ -260,7 +258,6 @@ taskForm.addEventListener('submit', async (e) => {
         formErrorText.textContent = error.message;
         formError.classList.add('show');
     } finally {
-        // ALWAYS reset the button state
         taskFormBtn.classList.remove('loading');
         taskFormBtn.disabled = false;
     }
@@ -270,7 +267,7 @@ taskForm.addEventListener('submit', async (e) => {
 let currentTaskID = null ;
 const notesTextarea = document.getElementById('notesTextarea')
 const saveStatus = document.getElementById('saveStatus');
-let saveTimeout; // This holds our timer
+let saveTimeout; 
 
 if (notesTextarea) {
     notesTextarea.addEventListener('input', (e) => {
@@ -314,6 +311,97 @@ if (notesTextarea) {
         }, 1000); // 1000 milliseconds = 1 second wait time
     });
 }
+
+// ===== TASK 2: ASSIGNEE DROPDOWN LOGIC =====
+
+const assigneeSelect = document.getElementById('assigneeSelect');
+
+async function loadAssignees() {
+    if (!assigneeSelect) return;
+    
+    assigneeSelect.innerHTML = '<option value="">Select a team member...</option>';
+    
+    try {
+        const response = await authFetch('/api/accounts/users/');
+        if (response.ok) {
+            const users = await response.json();
+            
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.email} (${user.role})`; 
+                assigneeSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Failed to load assignees:', error);
+        const option = document.createElement('option');
+        option.value = "";
+        option.textContent = "Backend not connected (Demo Mode)";
+        assigneeSelect.appendChild(option);
+    }
+}
+
+const originalOpenModal = openModal;
+function openModal() { 
+    modal.classList.add('active'); 
+    setTimeout(() => taskNameInput.focus(), 100);
+    loadAssignees(); 
+}
+
+createTaskBtn.addEventListener('click', async () => {
+    const name = taskNameInput.value.trim();
+    const assigneeId = assigneeSelect.value; 
+    
+    if (!name) {
+        taskNameInput.style.borderBottom = '2px solid #ff4757';
+        setTimeout(() => taskNameInput.style.borderBottom = 'none', 1500);
+        return;
+    }
+
+    const activeDay = document.querySelector('.modal-row:first-child .option-btn.active');
+    const day = activeDay ? activeDay.textContent : 'Today';
+
+    try {
+        const payload = {
+            title: name,
+            due_date: day,
+            status: 'TODO',
+            priority: 'MEDIUM'
+        };
+
+        if (assigneeId) {
+            payload.assignee = parseInt(assigneeId);
+        }
+
+        const response = await authFetch('/api/tasks/', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            closeModal();
+            await renderTasks(); 
+            document.querySelector('[data-view="tasks"]').click();
+        } else {
+            throw new Error('Backend failed');
+        }
+    } catch (error) {
+        const group = day === 'Today' ? 'today' : day === 'Tomorrow' ? 'tomorrow' : 'week';
+        mockTasksData[group].unshift({
+            id: Date.now(), 
+            title: name, 
+            due_date: day, 
+            status: 'TODO', 
+            priority: 'MEDIUM', 
+            team: 'My Team', 
+            assignee_avatar: 'https://i.pravatar.cc/40?img=1'
+        });
+        closeModal();
+        await renderTasks();
+        document.querySelector('[data-view="tasks"]').click();
+    }
+});
 
 // ============ INITIALIZE ============
 loadTasks();
