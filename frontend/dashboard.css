@@ -318,6 +318,33 @@ body {
     border-color: #667eea;
 }
 
+/* Date Input Styling */
+.date-input {
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.date-input:focus {
+    border-color: #F5D547;
+    background: #FFF9E0;
+}
+
+.icon-btn.edit-btn {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.icon-btn.edit-btn:hover {
+    background: #F5D547;
+    color: #1a1a1a;
+}
+
 .btn-submit {
     width: 100%;
     padding: 15px;

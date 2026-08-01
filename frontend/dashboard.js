@@ -92,6 +92,11 @@ function renderTask(task) {
                 <span class="task-assignee"><i class="fas fa-user"></i> ${currentUserEmail}</span>
             </div>
         </div>
+        <div class="task-actions" style="display:flex; gap:10px; margin-left:15px;">
+            <button class="icon-btn edit-btn" data-id="${task.id}" title="Edit Task">
+                <i class="fas fa-edit"></i>
+            </button>
+        </div>
         <div class="task-actions">
             <button class="icon-btn cycle-status" title="Cycle status">
                 <i class="fas fa-check"></i>
@@ -402,6 +407,119 @@ createTaskBtn.addEventListener('click', async () => {
         document.querySelector('[data-view="tasks"]').click();
     }
 });
+// ==========================================
+// EDIT TASK LOGIC
+// ==========================================
+
+let isEditing = false;
+let editingTaskId = null;
+const createTaskBtn = document.getElementById('createTaskBtn'); // Your existing button
+
+// 1. Event Delegation for the Edit Button
+document.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.edit-btn');
+    if (editBtn) {
+        const taskId = editBtn.dataset.id;
+        openEditModal(taskId);
+    }
+});
+
+// 2. Function to populate modal for editing
+async function openEditModal(taskId) {
+    try {
+        const response = await authFetch(`/api/tasks/${taskId}/`);
+        if (response.ok) {
+            const task = await response.json();
+            
+            // Populate fields
+            document.getElementById('taskNameInput').value = task.title;
+            document.getElementById('taskDescription').value = task.description || '';
+            document.getElementById('taskDueDate').value = task.due_date || '';
+            
+            // Set state
+            isEditing = true;
+            editingTaskId = taskId;
+            
+            // Change button text
+            createTaskBtn.textContent = 'Save Changes';
+            
+            // Open modal
+            document.getElementById('taskModal').classList.add('active');
+        }
+    } catch (error) {
+        console.error('Failed to load task for editing:', error);
+    }
+}
+
+// 3. Update your existing Create Task Button Listener
+// Replace your current createTaskBtn click listener with this unified version:
+
+createTaskBtn.addEventListener('click', async () => {
+    const name = document.getElementById('taskNameInput').value.trim();
+    const dueDate = document.getElementById('taskDueDate').value; // Get date value
+    const description = document.getElementById('taskDescription').value.trim();
+
+    // VALIDATION: Name and Date are now mandatory
+    if (!name) {
+        alert('Task name is required.');
+        return;
+    }
+    if (!dueDate) {
+        alert('Due date is mandatory. Please select a date.');
+        document.getElementById('taskDueDate').focus();
+        return;
+    }
+
+    const payload = {
+        title: name,
+        due_date: dueDate,
+        description: description,
+        status: 'TODO', // Default status
+        priority: 'MEDIUM' // Default priority
+    };
+
+    try {
+        let response;
+        
+        if (isEditing) {
+            // UPDATE EXISTING TASK (PATCH)
+            response = await authFetch(`/api/tasks/${editingTaskId}/`, {
+                method: 'PATCH',
+                body: JSON.stringify(payload)
+            });
+        } else {
+            // CREATE NEW TASK (POST)
+            response = await authFetch('/api/tasks/', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+        }
+
+        if (response.ok) {
+            closeModal(); // Make sure this resets isEditing = false and clears fields
+            await renderTasks(); 
+        } else {
+            alert('Failed to save task.');
+        }
+    } catch (error) {
+        console.error('Error saving task:', error);
+    }
+});
+
+// 4. Update your closeModal function to reset the edit state
+function closeModal() {
+    document.getElementById('taskModal').classList.remove('active');
+    document.getElementById('taskNameInput').value = '';
+    document.getElementById('taskDescription').value = '';
+    document.getElementById('taskDueDate').value = ''; 
+    
+    // Reset edit state
+    isEditing = false;
+    editingTaskId = null;
+    createTaskBtn.textContent = 'Create Task'; 
+}
+
+
 
 // ============ INITIALIZE ============
 loadTasks();
