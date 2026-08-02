@@ -174,17 +174,6 @@ Follow these steps to set up the project locally.
 | `GET` | `/notes/` | List all notes/comments for a specific task | ✅ |
 | `POST` | `/notes/` | Create a new note (used by debounced auto-save) | ✅ |
 
-## Engineering Decisions & Learnings
-
-1. **Why a Multi-Page Application (MPA)?**
-Chose an MPA architecture over a heavy SPA (like React) to demonstrate mastery of vanilla JavaScript, the HTTP request/response lifecycle, and to keep the bundle size at absolute zero without build tools like Webpack.
-
-2. **Why a Debouncer for Notes?**
-Typing a 50-word note generates ~300 keystrokes. Without a debouncer, this would spam the server with 300 `POST` requests in seconds. The 1-second debouncer reduces this to **1 single, efficient request**, showcasing performance optimization skills.
-
-3. **Why Separate Notes from Description?**
-The `description` is the static requirement of the task. `Notes` represent a dynamic, chronological collaboration feed. This demonstrates competency in relational database design (One-to-Many ForeignKeys).
-
 ---
 
 ## **Future Roadmap**
