@@ -1,14 +1,14 @@
-# Secure RESTful Task Management System
+# Secure RESTful Task Manager
 
-An enterprise-grade, decoupled task management application built with \*\*Django REST Framework\*\* (Backend) and \*\*Vanilla JavaScript/HTML/CSS\*\* (Frontend). This project demonstrates production-ready patterns including JWT authentication, strict tenant isolation, relational database design, and advanced frontend performance optimizations.
+An enterprise-grade, decoupled task management application built with **Django REST Framework** (Backend) and **Vanilla JavaScript/HTML/CSS** (Frontend). This project demonstrates production-ready patterns including JWT authentication, strict tenant isolation, relational database design, and advanced frontend performance optimizations.
 
-!\[Python\]([https://img.shields.io/badge/Python-3.10+-blue.svg](https://img.shields.io/badge/Python-3.10+-blue.svg) )
+![Python]([https://img.shields.io/badge/Python-3.10+-blue.svg](https://img.shields.io/badge/Python-3.10+-blue.svg) )
 
-!\[Django\]([https://img.shields.io/badge/Django-4.x-092E20.svg](https://img.shields.io/badge/Django-4.x-092E20.svg) )
+![Django]([https://img.shields.io/badge/Django-4.x-092E20.svg](https://img.shields.io/badge/Django-4.x-092E20.svg) )
 
-!\[DRF\]([https://img.shields.io/badge/DRF-3.14-red.svg](https://img.shields.io/badge/DRF-3.14-red.svg) )
+![DRF]([https://img.shields.io/badge/DRF-3.14-red.svg](https://img.shields.io/badge/DRF-3.14-red.svg) )
 
-!\[License\]([https://img.shields.io/badge/License-MIT-green.svg](https://img.shields.io/badge/License-MIT-green.svg) )
+![License]([https://img.shields.io/badge/License-MIT-green.svg](https://img.shields.io/badge/License-MIT-green.svg) )
 
 ---
 
@@ -16,31 +16,35 @@ An enterprise-grade, decoupled task management application built with \*\*Django
 
 ### Enterprise Security & Architecture
 
-\- \*\*JWT Authentication\*\*: Stateless, secure login/registration using `djangorestframework-simplejwt`.
+- **JWT Authentication**:
+    Stateless, secure login/registration using `djangorestframework-simplejwt`.
 
-\- \*\*Strict Tenant Isolation\*\*: Overridden `get_queryset()` ensures users can  *only*  access, modify, or delete their own tasks.
+- **Strict Tenant Isolation**:
+    Overridden `get_queryset()` ensures users can  *only*  access, modify, or delete their own tasks.
 
-\- \*\*IDOR Prevention\*\*: Custom `IsOwner` permission classes and `get_object_or_404` checks prevent unauthorized cross-user data manipulation.
+- **IDOR Prevention**:
+    Custom `IsOwner` permission classes and `get_object_or_404` checks prevent unauthorized cross-user data manipulation.
 
-\- \*\*Role-Based Access\*\*: Custom User model supporting `SENIOR` and `JUNIOR` roles for task assignment workflows.
+- **Role-Based Access**:
+    Custom User model supporting `SENIOR` and `JUNIOR` roles for task assignment workflows.
 
 ### Advanced Frontend Engineering
 
-\- \*\*Zero-Dependency UI\*\*: Premium, responsive design built entirely from scratch with Vanilla CSS (no Bootstrap or Tailwind).
+- **Zero-Dependency UI**: Premium, responsive design built entirely from scratch with Vanilla CSS (no Bootstrap or Tailwind).
 
-\- \*\*Custom `authFetch` Wrapper\*\*: Centralized API client that automatically injects Bearer tokens and handles `401 Unauthorized` session expirations globally.
+- **Custom `authFetch` Wrapper**: Centralized API client that automatically injects Bearer tokens and handles `401 Unauthorized` session expirations globally.
 
-\- \*\*Debounced Auto-Save\*\*: Enterprise-grade task notes feature using a JavaScript debouncer. Waits 1 second after typing stops before firing a `POST` request, preventing API spam and database overload.
+- **Debounced Auto-Save**: Enterprise-grade task notes feature using a JavaScript debouncer. Waits 1 second after typing stops before firing a `POST` request, preventing API spam and database overload.
 
-\- \*\*Dynamic DOM Rendering\*\*: Task cards and UI components are rendered dynamically from JSON payloads with conditional CSS styling based on status and priority.
+- **Dynamic DOM Rendering**: Task cards and UI components are rendered dynamically from JSON payloads with conditional CSS styling based on status and priority.
 
-\### Robust Backend Design
+### Robust Backend Design
 
-\- \*\*Relational Data\*\*: One-to-Many relationship between `Task` and `Note` models, allowing chronological collaboration feeds.
+- **Relational Data**: One-to-Many relationship between `Task` and `Note` models, allowing chronological collaboration feeds.
 
-\- \*\*Optimized Pagination\*\*: Custom `TaskPagination` with a strict `max_page_size` to prevent database abuse.
+- **Optimized Pagination**: Custom `TaskPagination` with a strict `max_page_size` to prevent database abuse.
 
-\- \*\*Nested Serialization\*\*: Efficient data fetching where task details and their associated notes are returned in a single, optimized API response.
+- **Nested Serialization**: Efficient data fetching where task details and their associated notes are returned in a single, optimized API response.
 
 ---
 
@@ -50,21 +54,21 @@ An enterprise-grade, decoupled task management application built with \*\*Django
 
 | :--- | :--- |
 
-| \*\*Backend\*\* | Python, Django, Django REST Framework, SQLite (Dev) / PostgreSQL (Prod) |
+| **Backend** | Python, Django, Django REST Framework, SQLite (Dev) / PostgreSQL (Prod) |
 
-| \*\*Frontend\*\* | Vanilla JavaScript (ES6+), HTML5, CSS3 (Flexbox/Grid) |
+| **Frontend** | Vanilla JavaScript (ES6+), HTML5, CSS3 (Flexbox/Grid) |
 
-| \*\*Authentication\*\* | JSON Web Tokens (JWT), Custom User Model |
+| **Authentication** | JSON Web Tokens (JWT), Custom User Model |
 
-| \*\*Tooling\*\* | Git, GitHub, Postman (API Testing) |
+| **Tooling** | Git, GitHub, Postman (API Testing) |
 
 ---
 
 ## Project Structure
 
-\`\`\`text
+```text
 
-enterprise\_task\_manager/
+enterprise_task_manager/
 
 ├── accounts/ # Custom User model, Auth views, and User listing API
 
@@ -84,7 +88,7 @@ enterprise\_task\_manager/
 
 │ └── dashboard.js # Dashboard logic (includes debouncer & authFetch)
 
-├── enterprise\_task\_manager/ # Core Django project settings and root URLs
+├── enterprise_task_manager/ # Core Django project settings and root URLs
 
 ├── [manage.py](http://manage.py)
 
@@ -96,45 +100,45 @@ enterprise\_task\_manager/
 
 Follow these steps to set up the project locally.
 
-### **1\. Clone the Repository**
+### **1. Clone the Repository**
 
     bash
     git clone https://github.com/bikrant0/enterprise-task-api-django.git
     cd enterprise-task-api-django
 
-### **2\. Set Up Virtual Environment**
+### **2. Set Up Virtual Environment**
 
     bash
     # Windows
     python -m venv venv
-    venv\Scripts\activate
+    venvScriptsactivate
     
     # macOS/Linux
     python3 -m venv venv
     source venv/bin/activate
 
-### **3\. Install Dependencies**
+### **3. Install Dependencies**
 
     bash
     pip install -r requirements.txt
 
-### **4\. Configure Database & Run Migrations**
+### **4. Configure Database & Run Migrations**
 
     bash
     python manage.py makemigrations
     python manage.py migrate
 
-### **5\. Create a Superuser (Optional, for Admin Panel)**
+### **5. Create a Superuser (Optional, for Admin Panel)**
 
     bash
     python manage.py createsuperuser
 
-### **6\. Start the Development Server**
+### **6. Start the Development Server**
 
     bash
     python manage.py runserver
 
-### **7\. Access the Application**
+### **7. Access the Application**
 
 * **Frontend (Auth)**: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
@@ -173,17 +177,6 @@ Follow these steps to set up the project locally.
 | :--- | :--- | :--- | :---: |
 | `GET` | `/notes/` | List all notes/comments for a specific task | ✅ |
 | `POST` | `/notes/` | Create a new note (used by debounced auto-save) | ✅ |
-
-## Engineering Decisions & Learnings
-
-1. **Why a Multi-Page Application (MPA)?**
-Chose an MPA architecture over a heavy SPA (like React) to demonstrate mastery of vanilla JavaScript, the HTTP request/response lifecycle, and to keep the bundle size at absolute zero without build tools like Webpack.
-
-2. **Why a Debouncer for Notes?**
-Typing a 50-word note generates ~300 keystrokes. Without a debouncer, this would spam the server with 300 `POST` requests in seconds. The 1-second debouncer reduces this to **1 single, efficient request**, showcasing performance optimization skills.
-
-3. **Why Separate Notes from Description?**
-The `description` is the static requirement of the task. `Notes` represent a dynamic, chronological collaboration feed. This demonstrates competency in relational database design (One-to-Many ForeignKeys).
 
 ---
 
