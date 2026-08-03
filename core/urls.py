@@ -4,6 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.http import JsonResponse
 from tasks.views import frontend_page, dashboard_page
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', frontend_page, name='login'),
