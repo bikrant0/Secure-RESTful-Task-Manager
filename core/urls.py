@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.http import JsonResponse
 from tasks.views import frontend_page, dashboard_page
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -16,3 +16,6 @@ urlpatterns = [
      path('api/accounts/', include('accounts.urls')),
   
 ]
+
+# Serve static files in production
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
