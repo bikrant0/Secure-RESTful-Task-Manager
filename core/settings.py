@@ -13,9 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dummy-key-for-local-dev-only')
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
+    'enterprise-task-api-django-iblk.onrender.com', 
     '.onrender.com',
     'localhost',
     '127.0.0.1'
