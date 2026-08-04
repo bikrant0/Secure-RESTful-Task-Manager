@@ -12,7 +12,6 @@ toggleBtn.addEventListener("click", () => {
   // Toggle input type
   if (passwordInput.type === "password") {
     passwordInput.type = "text";
-    // Update icon to 'eye-slash' (hide)
     eyeIcon.classList.remove("fa-eye");
     eyeIcon.classList.add("fa-eye-slash");
   } else {
@@ -135,7 +134,7 @@ if (loginForm) {
         btn.disabled = true;
 
         try {
-            const response = await fetch('/api/auth/login/', {
+            const response = await fetch('/api/accounts/login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, password: password })
@@ -217,7 +216,7 @@ if (signupForm) {
         btn.disabled = true;
 
         try {
-            const response = await fetch('/api/auth/register/', {
+            const response = await fetch('/api/accounts/register/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -269,7 +268,7 @@ document.querySelectorAll('.social-btn').forEach(btn => {
         setTimeout(() => {
             this.style.opacity = '1';
             this.style.pointerEvents = 'auto';
-            alert(`${provider} login/signup would be implemented here.`);
+            alert(`${provider} Login/Signup would be implemented here.`);
         }, 500);
     });
 });
