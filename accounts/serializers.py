@@ -25,7 +25,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'user','first_name', 'email','password']
+        fields = ['id', 'user','first_name', 'email','password', 'role']
         
         extra_kwargs = {
             'password' : {'write_only': True},
@@ -37,4 +37,5 @@ class RegisterSerializer(serializers.ModelSerializer):
             email = validated_data['email'],
             password = validated_data['password'],
             first_name = validated_data.get('first_name', ''),
+            role = validated_data('role'),
         )

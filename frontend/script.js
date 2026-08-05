@@ -7,6 +7,7 @@ function validateEmail(email) {
 const passwordInput = document.getElementById("passwordInput");
 const toggleBtn = document.getElementById("toggleBtn");
 const eyeIcon = document.getElementById("eyeIcon");
+const API_BASE_URL = 'https://enterprise-task-api-django-iblk.onrender.com';
 
 toggleBtn.addEventListener("click", () => {
   // Toggle input type
@@ -134,7 +135,7 @@ if (loginForm) {
         btn.disabled = true;
 
         try {
-            const response = await fetch('/api/accounts/login/', {
+            const response = await fetch('${API_BASE_URL}/api/accounts/login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, password: password })
@@ -216,7 +217,7 @@ if (signupForm) {
         btn.disabled = true;
 
         try {
-            const response = await fetch('/api/accounts/register/', {
+            const response = await fetch('${API_BASE_URL}/api/accounts/register/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
