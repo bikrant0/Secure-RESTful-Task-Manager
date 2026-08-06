@@ -4,24 +4,22 @@ function validateEmail(email) {
     return re.test(email);
 }
 
-const passwordInput = document.getElementById("passwordInput");
-const toggleBtn = document.getElementById("toggleBtn");
-const eyeIcon = document.getElementById("eyeIcon");
 const API_BASE_URL = 'https://enterprise-task-api-django-iblk.onrender.com';
+function togglePassword(inputId, spanElement) {
+    const input = document.getElementById(inputId);
+    const icon = spanElement.querySelector('i');
 
-toggleBtn.addEventListener("click", () => {
-  // Toggle input type
-  if (passwordInput.type === "password") {
-    passwordInput.type = "text";
-    eyeIcon.classList.remove("fa-eye");
-    eyeIcon.classList.add("fa-eye-slash");
-  } else {
-    passwordInput.type = "password";
-    // Update icon to 'eye' (show)
-    eyeIcon.classList.remove("fa-eye-slash");
-    eyeIcon.classList.add("fa-eye");
-  }
-});   
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    }
+}
+ 
 
 // --- 1. VIEW SWITCHING (LOGIN <-> SIGNUP) ---
 const loginView = document.getElementById('loginView');

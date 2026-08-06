@@ -193,7 +193,7 @@ body {
 
 .input-wrapper {
     position: relative;
-    width: 100%; /* FIXED: Changed from inline-block to 100% width */
+    width: 100%; 
 }
 
 .input-wrapper i {
@@ -208,7 +208,7 @@ body {
 
 .form-group input {
     width: 100%;
-    padding: 14px 45px 14px 45px; /* FIXED: Removed invalid flex properties */
+    padding: 14px 45px 14px 45px; 
     border: 2px solid #e0e0e0;
     border-radius: 12px;
     font-size: 15px;
@@ -225,8 +225,7 @@ body {
 }
 
 .password-toggle {
-    position: absolute;
-    right: 15px;
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
@@ -234,12 +233,13 @@ body {
     transition: color 0.3s ease;
     z-index: 10;
     pointer-events: auto;
-    padding: 5px;
+    
 }
 
 .password-toggle:hover {
     color: #667eea;
 }
+
 
 /* Input validation styles */
 .form-group input.valid {
