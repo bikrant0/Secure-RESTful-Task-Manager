@@ -133,7 +133,7 @@ if (loginForm) {
         btn.disabled = true;
 
         try {
-            const response = await fetch('${API_BASE_URL}/api/accounts/login/', {
+            const response = await fetch(`${API_BASE_URL}/api/accounts/login/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, password: password })
@@ -215,7 +215,7 @@ if (signupForm) {
         btn.disabled = true;
 
         try {
-            const response = await fetch('${API_BASE_URL}/api/accounts/register/', {
+            const response = await fetch(`${API_BASE_URL}/api/accounts/register/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
