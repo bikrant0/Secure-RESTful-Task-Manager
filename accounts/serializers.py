@@ -23,13 +23,15 @@ class TaskSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'user']
 
 class RegisterSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source = 'first_name', required = False)
     class Meta:
         model = User
-        fields = ['id', 'user','first_name', 'email','password', 'role']
+        fields = ['id','name', 'email','password', 'role']
         
         extra_kwargs = {
             'password' : {'write_only': True},
             'email' : {'required': True},
+            'role': {'required':False}
         }
         
     def create(self, validated_data):
@@ -37,5 +39,5 @@ class RegisterSerializer(serializers.ModelSerializer):
             email = validated_data['email'],
             password = validated_data['password'],
             first_name = validated_data.get('first_name', ''),
-            role = validated_data('role'),
+            role = validated_data('role', 'User'),
         )

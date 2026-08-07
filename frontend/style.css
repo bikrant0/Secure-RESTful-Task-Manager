@@ -225,15 +225,22 @@ body {
 }
 
 .password-toggle {
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
     cursor: pointer;
     color: #999;
     transition: color 0.3s ease;
     z-index: 10;
     pointer-events: auto;
     
+}
+
+.password-toggle-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    color: inherit;
 }
 
 .password-toggle:hover {
