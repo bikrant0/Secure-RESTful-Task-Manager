@@ -151,6 +151,7 @@ if (loginForm) {
                 // 1. Save tokens
                 localStorage.setItem('access', data.access);
                 localStorage.setItem('refresh', data.refresh);
+                localStorage.setItem('userEmail', email);
 
                 // 2. Show visual success message
                 if (successMsg) {
