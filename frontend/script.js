@@ -95,6 +95,14 @@ if (forgotForm) {
 }
 
 // --- 3. LOGIN FORM SUBMISSION (Simplified for Email Only) ---
+/**
+ * Authenticates the user against the Django REST API.
+ * On success, intercepts the JWT access/refresh tokens and user email, 
+ * stores them in LocalStorage for session persistence, and redirects to the dashboard.
+ * * @param {Event} e - The form submission event
+ */
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    // ... your existing code ...
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
