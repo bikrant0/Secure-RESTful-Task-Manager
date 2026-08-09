@@ -71,9 +71,10 @@ function hideBannerError() {
 
 // Disable past dates in date picker
 document.addEventListener('DOMContentLoaded', () => {
-    if (taskDueDateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        taskDueDateInput.setAttribute('min', today);
+    const dateInput = document.getElementById('taskDueDate');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0]; 
+        dateInput.setAttribute('min', today);
     }
 });
 
