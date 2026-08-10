@@ -102,7 +102,6 @@ if (forgotForm) {
  * * @param {Event} e - The form submission event
  */
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    // ... your existing code ...
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
