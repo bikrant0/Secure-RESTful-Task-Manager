@@ -280,4 +280,4 @@ document.querySelectorAll('.social-btn').forEach(btn => {
         }, 500);
     });
 });
-});
+
