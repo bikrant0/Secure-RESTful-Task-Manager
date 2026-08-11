@@ -99,13 +99,11 @@ if (forgotForm) {
  * Authenticates the user against the Django REST API.
  * On success, intercepts the JWT access/refresh tokens and user email, 
  * stores them in LocalStorage for session persistence, and redirects to the dashboard.
- * * @param {Event} e - The form submission event
  */
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+        e.preventDefault(); 
         const errorDiv = document.getElementById('loginError');
         const errorText = document.getElementById('loginErrorText');
         const btn = document.getElementById('loginBtn');
@@ -155,20 +153,17 @@ if (loginForm) {
                 errorText.textContent = data.detail || 'Invalid email or password.';
                 errorDiv.classList.add('show');
             } else {
-                // 1. Save tokens
+                // 1. Save tokens AND email
                 localStorage.setItem('access', data.access);
                 localStorage.setItem('refresh', data.refresh);
-                localStorage.setItem('userEmail', email);
+                localStorage.setItem('email', email);
 
-                // 2. Show visual success message
+                
                 if (successMsg) {
                     successMsg.classList.add('show');
                 }
 
-                // 3. Clear the form
-                loginForm.reset();
-
-                // 4. Redirect to dashboard after 1 second
+                loginForm.reset();             
                 setTimeout(() => {
                     window.location.href = '/dashboard/';
                 }, 1000);
@@ -181,7 +176,6 @@ if (loginForm) {
         }
     });
 }
-});
 
 // --- 4. SIGNUP FORM SUBMISSION ---
 const signupForm = document.getElementById('signupForm');
