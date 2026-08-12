@@ -1,3 +1,4 @@
+const API_BASE_URL = 'https://enterprise-task-api-django-iblk.onrender.com';
 // ============ AUTH GUARD ============
 if (!localStorage.getItem('access')) {
     window.location.href = '/'; 
@@ -45,7 +46,7 @@ const errorBannerText = document.getElementById('errorBannerText');
 const modal = document.getElementById('taskModal');
 const newTaskBtn = document.getElementById('newTaskBtn');
 const modalClose = document.getElementById('modalClose');
-const createTaskBtn = document.getElementById('createTaskBtn'); // Unified button
+const createTaskBtn = document.getElementById('createTaskBtn'); 
 const formError = document.getElementById('formError');
 const formErrorText = document.getElementById('formErrorText');
 
@@ -124,7 +125,7 @@ async function loadTasks() {
     if (!taskList) return;
 
     try {
-        const response = await authFetch('/api/tasks/');
+        const response = await authFetch(`${API_BASE_URL}/api/tasks/`);
         if (!response.ok) throw new Error('Could not load tasks.');
         
         const data = await response.json();
@@ -167,7 +168,7 @@ if (taskList) {
             const next = order[(order.indexOf(currentStatus) + 1) % order.length];
 
             try {
-                const response = await authFetch(`/api/tasks/${id}/`, {
+                const response = await authFetch(`{API_BASE_URL}/api/tasks/${id}/`, {
                     method: 'PATCH',
                     body: JSON.stringify({ status: next })
                 });
@@ -183,7 +184,7 @@ if (taskList) {
             if (!confirm("Are you sure you want to delete this task?")) return; 
             
             try {
-                const response = await authFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
+                const response = await authFetch(`{API_BASE_URL}/api/tasks/${id}/`, { method: 'DELETE' });
                 if (response.ok || response.status === 204) {
                     loadTasks();
                 } else {
@@ -233,7 +234,7 @@ if (modal) {
 // ============ EDIT MODAL LOGIC ============
 async function openEditModal(taskId) {
     try {
-        const response = await authFetch(`/api/tasks/${taskId}/`);
+        const response = await authFetch(`{API_BASE_URL}/api/tasks/${taskId}/`);
         if (response.ok) {
             const task = await response.json();
             
@@ -297,13 +298,13 @@ if (createTaskBtn) {
             let response;
             if (isEditing) {
                 // UPDATE EXISTING TASK
-                response = await authFetch(`/api/tasks/${editingTaskId}/`, {
+                response = await authFetch(`{API_BASE_URL}/api/tasks/${editingTaskId}/`, {
                     method: 'PATCH',
                     body: JSON.stringify(payload)
                 });
             } else {
                 // CREATE NEW TASK
-                response = await authFetch('/api/tasks/', {
+                response = await authFetch('{API_BASE_URL}/api/tasks/', {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
@@ -336,7 +337,7 @@ async function loadAssignees() {
     assigneeSelect.innerHTML = '<option value="">Select a team member...</option>';
     
     try {
-        const response = await authFetch('/api/accounts/users/');
+        const response = await authFetch('{API_BASE_URL}/api/accounts/users/');
         if (response.ok) {
             const users = await response.json();
             users.forEach(user => {
@@ -352,7 +353,7 @@ async function loadAssignees() {
 }
 
 // ============ THE DEBOUNCER (NOTES) ============
-let currentTaskId = null; // FIXED TYPO (was currentTaskID)
+let currentTaskId = null; 
 const notesTextarea = document.getElementById('notesTextarea');
 const saveStatus = document.getElementById('saveStatus');
 let saveTimeout; 
@@ -373,7 +374,7 @@ if (notesTextarea && saveStatus) {
             }
 
             try {
-                const response = await authFetch(`/api/tasks/${currentTaskId}/notes/`, {
+                const response = await authFetch(`{API_BASE_URL}/api/tasks/${currentTaskId}/notes/`, {
                     method: 'POST',
                     body: JSON.stringify({ content: content })
                 });

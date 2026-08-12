@@ -276,6 +276,13 @@ body {
     color: #1a1a1a;
 }
 
+.modal-row {
+    display: flex;
+    flex-direction: column; 
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
 .form-group {
     margin-bottom: 20px;
 }
@@ -451,10 +458,12 @@ body {
 
 
 .assignee-select {
-    padding: 8px 16px;
-    border: 1px solid #e0e0e0;
-    background: #fff; /* Force white background */
-    border-radius: 20px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background: #fff;
     font-size: 13px;
     cursor: pointer;
     outline: none;
@@ -480,3 +489,5 @@ body {
 .assignee-select option:hover {
     background: #F5D547;
 }
+
+
