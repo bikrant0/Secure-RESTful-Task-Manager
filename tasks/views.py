@@ -5,6 +5,8 @@ from .models import Task
 from .serializers import TaskSerializer, NoteSerializer
 from .pagination import TaskPagination
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
+
 
 class TaskListCreateView(generics.ListCreateAPIView):
     
@@ -12,7 +14,9 @@ class TaskListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return Task.objects.filter(user=self.request.user).order_by('-created_at')
+        return Task.objects.filter(
+            Q(user=self.request.user) | Q(assignee = self.request.user)
+            ).distinct()
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
