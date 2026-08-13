@@ -46,7 +46,8 @@ const errorBannerText = document.getElementById('errorBannerText');
 const modal = document.getElementById('taskModal');
 const newTaskBtn = document.getElementById('newTaskBtn');
 const modalClose = document.getElementById('modalClose');
-const createTaskBtn = document.getElementById('createTaskBtn'); 
+const taskForm = document.getElementById('taskForm'); 
+const createTaskBtn = document.getElementById('taskFormBtn')
 const formError = document.getElementById('formError');
 const formErrorText = document.getElementById('formErrorText');
 
@@ -56,7 +57,7 @@ const taskDescriptionInput = document.getElementById('taskDescription');
 const taskDueDateInput = document.getElementById('taskDueDate');
 const assigneeSelect = document.getElementById('assigneeSelect');
 
-let isEditing = false;
+let isEditing = true;
 let editingTaskId = null;
 
 // ============ UI HELPERS ============
@@ -184,7 +185,7 @@ if (taskList) {
             if (!confirm("Are you sure you want to delete this task?")) return; 
             
             try {
-                const response = await authFetch(`{$API_BASE_URL}/api/tasks/${id}/`, { method: 'DELETE' });
+                const response = await authFetch(`${API_BASE_URL}/api/tasks/${id}/`, { method: 'DELETE' });
                 if (response.ok || response.status === 204) {
                     loadTasks();
                 } else {
@@ -234,7 +235,7 @@ if (modal) {
 // ============ EDIT MODAL LOGIC ============
 async function openEditModal(taskId) {
     try {
-        const response = await authFetch(`{$API_BASE_URL}/api/tasks/${taskId}/`);
+        const response = await authFetch(`${API_BASE_URL}/api/tasks/${taskId}/`);
         if (response.ok) {
             const task = await response.json();
             
@@ -258,8 +259,10 @@ async function openEditModal(taskId) {
 }
 
 // ============ CREATE / UPDATE TASK LOGIC (Unified) ============
-if (createTaskBtn) {
-    createTaskBtn.addEventListener('click', async () => {
+if (taskForm) {
+    taskForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); 
+
         if (formError) formError.classList.remove('show');
 
         const name = taskNameInput ? taskNameInput.value.trim() : '';
@@ -267,7 +270,6 @@ if (createTaskBtn) {
         const dueDate = taskDueDateInput ? taskDueDateInput.value : '';
         const assigneeId = assigneeSelect ? assigneeSelect.value : '';
 
-        // VALIDATION: Name and Date are mandatory
         if (!name) {
             if (formErrorText) formErrorText.textContent = 'Task title is required.';
             if (formError) formError.classList.add('show');
@@ -291,13 +293,14 @@ if (createTaskBtn) {
             payload.assignee = parseInt(assigneeId);
         }
 
-        createTaskBtn.classList.add('loading');
-        createTaskBtn.disabled = true;
+        if (createTaskBtn) {
+            createTaskBtn.classList.add('loading');
+            createTaskBtn.disabled = true;
+        }
 
         try {
             let response;
             if (isEditing) {
-                // UPDATE EXISTING TASK
                 response = await authFetch(`${API_BASE_URL}/api/tasks/${editingTaskId}/`, {
                     method: 'PATCH',
                     body: JSON.stringify(payload)
@@ -324,8 +327,10 @@ if (createTaskBtn) {
             if (formErrorText) formErrorText.textContent = 'Network error.';
             if (formError) formError.classList.add('show');
         } finally {
-            createTaskBtn.classList.remove('loading');
-            createTaskBtn.disabled = false;
+            if (createTaskBtn) {
+                createTaskBtn.classList.remove('loading');
+                createTaskBtn.disabled = false;
+            }
         }
     });
 }
