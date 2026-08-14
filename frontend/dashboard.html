@@ -45,8 +45,19 @@
             <div class="modal-header">
                 <h3>New Task</h3>
             </div>
+            <div class="toolbar" style="display: flex; justify-content: space-between; align-items: center;">
+            <select id="statusFilter" style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; outline: none;">
+                <option value="">All Tasks</option>
+                <option value="TODO">To Do</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="DONE">Done</option>
+            </select>
 
-            <div class="error-message" id="formError">
+            <button id="newTaskBtn" class="btn-submit btn-new-task" style="margin-top: 0; width: auto;">
+                <i class="fas fa-plus"></i> New Task
+            </button>
+        </div>
+                    <div class="error-message" id="formError">
                 <i class="fas fa-exclamation-circle"></i>
                 <span id="formErrorText">Error</span>
             </div>

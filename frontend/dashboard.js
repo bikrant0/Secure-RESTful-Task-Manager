@@ -42,6 +42,7 @@ const taskList = document.getElementById('taskList');
 const emptyState = document.getElementById('emptyState');
 const errorBanner = document.getElementById('errorBanner');
 const errorBannerText = document.getElementById('errorBannerText');
+const statusFilter = document.getElementById('statusFilter');
 
 const modal = document.getElementById('taskModal');
 const newTaskBtn = document.getElementById('newTaskBtn');
@@ -120,17 +121,30 @@ function renderTask(task) {
     return card;
 }
 
-// ============ LOAD TASKS (Handles Pagination) ============
+
+if (statusFilter) {
+    statusFilter.addEventListener('change', () => {
+        loadTasks();
+    });
+}
+// ============ LOAD TASKS  ============
 async function loadTasks() {
     hideBannerError();
     if (!taskList) return;
 
     try {
-        const response = await authFetch(`${API_BASE_URL}/api/tasks/`);
+        let url = `${API_BASE_URL}/api/tasks/`;
+        
+   
+        if (statusFilter && statusFilter.value !== "") {
+            url += `?status=${statusFilter.value}`;
+        }
+        
+        const response = await authFetch(url); 
         if (!response.ok) throw new Error('Could not load tasks.');
         
         const data = await response.json();
-        // THE FIX: Handle Pagination (data.results) or flat array (data)
+        
         const tasks = data.results || data;
         
         taskList.innerHTML = '';

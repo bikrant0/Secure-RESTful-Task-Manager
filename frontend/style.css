@@ -193,10 +193,37 @@ body {
 
 .input-wrapper {
     position: relative;
-    width: 100%; 
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
-.input-wrapper i {
+/* Base style for all form inputs */
+.form-group input {
+    width: 100%;
+    /* Leave 45px of space on BOTH the left and right sides for the icons */
+    padding: 14px 45px 14px 45px; 
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #667eea;
+}
+
+/* Highlight the lock icon when the input is clicked */
+.form-group input:focus + i {
+    color: #667eea;
+}
+
+/* --- THE ICONS --- */
+
+/* Left Icon (The Lock) */
+.input-wrapper > i.fas.fa-lock {
     position: absolute;
     left: 15px;
     top: 50%;
@@ -204,49 +231,36 @@ body {
     color: #999;
     transition: color 0.3s ease;
     pointer-events: none;
+    z-index: 5;
 }
 
-.form-group input {
-    width: 100%;
-    padding: 14px 45px 14px 45px; 
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    font-size: 15px;
-    transition: all 0.3s ease;
-    outline: none;
-}
-
-.form-group input:focus {
-    border-color: #667eea;
-}
-
-.form-group input:focus + i {
-    color: #667eea;
-}
-
-.password-toggle {
-    cursor: pointer;
-    color: #999;
-    transition: color 0.3s ease;
+/* Right Icon Box (The Eye Container) */
+.input-wrapper .password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 10;
-    pointer-events: auto;
-    
 }
 
+/* The invisible button holding the Eye */
 .password-toggle-btn {
     background: transparent;
     border: none;
-    box-shadow: none;
     cursor: pointer;
-    padding: 0;
+    padding: 5px;
     outline: none;
-    color: inherit;
+    color: #999;
+    transition: color 0.3s ease;
+    font-size: 16px;
 }
 
-.password-toggle:hover {
-    color: #667eea;
+.password-toggle-btn:hover {
+    color: #333; 
 }
-
 
 /* Input validation styles */
 .form-group input.valid {
