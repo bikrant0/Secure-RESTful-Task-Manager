@@ -1,6 +1,7 @@
 # Secure RESTful Task Manager
 
 An enterprise-grade, decoupled task management application built with **Django REST Framework** (Backend) and **Vanilla JavaScript/HTML/CSS** (Frontend). This project demonstrates production-ready patterns including JWT authentication, strict tenant isolation, relational database design, and advanced frontend performance optimizations.
+
 ![My Skills](https://skillicons.dev/icons?i=python) 
 ![Django](https://skillicons.dev/icons?i=django) 
 ![License](https://img.shields.io/github/license/bikrant0/Secure-RESTful-Task-Manager)    
