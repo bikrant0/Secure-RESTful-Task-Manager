@@ -1,17 +1,13 @@
 # Secure RESTful Task Manager
 
 An enterprise-grade, decoupled task management application built with **Django REST Framework** (Backend) and **Vanilla JavaScript/HTML/CSS** (Frontend). This project demonstrates production-ready patterns including JWT authentication, strict tenant isolation, relational database design, and advanced frontend performance optimizations.
-
-![Python]([https://img.shields.io/badge/Python-3.10+-blue.svg](https://img.shields.io/badge/Python-3.10+-blue.svg) )
-
-![Django]([https://img.shields.io/badge/Django-4.x-092E20.svg](https://img.shields.io/badge/Django-4.x-092E20.svg) )
-
-![DRF]([https://img.shields.io/badge/DRF-3.14-red.svg](https://img.shields.io/badge/DRF-3.14-red.svg) )
-
-![License]([https://img.shields.io/badge/License-MIT-green.svg](https://img.shields.io/badge/License-MIT-green.svg) )
+![My Skills](https://skillicons.dev/icons?i=python) 
+![Django](https://skillicons.dev/icons?i=django) 
+![License](https://img.shields.io/github/license/bikrant0/Secure-RESTful-Task-Manager)    
+ 
+Python Django License
 
 ---
-
 ## Key Features
 
 ### Enterprise Security & Architecture
@@ -88,8 +84,8 @@ enterprise_task_manager/
 ├── [manage.py](http://manage.py)
 
 └── requirements.txt
+```
 
----
 
 ## Getting Started
 
@@ -97,41 +93,47 @@ Follow these steps to set up the project locally.
 
 ### **1. Clone the Repository**
 
-    bash
+```bash
     git clone https://github.com/bikrant0/enterprise-task-api-django.git
     cd enterprise-task-api-django
+```
 
 ### **2. Set Up Virtual Environment**
 
-    bash
+```bash
     # Windows
     python -m venv venv
     venvScriptsactivate
-    
+   
     # macOS/Linux
     python3 -m venv venv
     source venv/bin/activate
+```
 
 ### **3. Install Dependencies**
 
-    bash
+```bash
     pip install -r requirements.txt
+```
 
 ### **4. Configure Database & Run Migrations**
 
-    bash
+```bash
     python manage.py makemigrations
     python manage.py migrate
+```
 
 ### **5. Create a Superuser (Optional, for Admin Panel)**
 
-    bash
+```bash
     python manage.py createsuperuser
+```
 
 ### **6. Start the Development Server**
 
-    bash
+```bash
     python manage.py runserver
+```
 
 ### **7. Access the Application**
 
