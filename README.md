@@ -51,15 +51,10 @@ An enterprise-grade, decoupled task management application built with **Django R
 ## Tech Stack
 
 | Layer | Technologies |
-
-| :--- | :--- |
-
+| :--- | :--- | 
 | **Backend** | Python, Django, Django REST Framework, SQLite (Dev) / PostgreSQL (Prod) |
-
 | **Frontend** | Vanilla JavaScript (ES6+), HTML5, CSS3 (Flexbox/Grid) |
-
 | **Authentication** | JSON Web Tokens (JWT), Custom User Model |
-
 | **Tooling** | Git, GitHub, Postman (API Testing) |
 
 ---
